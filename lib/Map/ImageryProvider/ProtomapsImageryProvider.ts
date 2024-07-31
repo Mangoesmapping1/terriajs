@@ -12,6 +12,7 @@ import {
   LabelRule,
   Labelers,
   LineSymbolizer,
+  CircleSymbolizer,
   Rule as PaintRule,
   PmtilesSource,
   PreparedTile,
@@ -704,16 +705,25 @@ export default class ProtomapsImageryProvider
 
     const featureId = feature.properties?.[featureProp]?.getValue();
 
+    let style = {
+      fill: 'blue',
+      width: 2
+    };
+    if (isDefined(feature.properties) && feature.properties.highlighted == "true") {
+      style = {
+        fill: 'cyan',
+        width: 4
+      }
+    }
+
+
     if (isDefined(featureId) && isDefined(layerName)) {
       return this.clone({
         labelRules: [],
         paintRules: [
           {
             dataLayer: layerName,
-            symbolizer: new LineSymbolizer({
-              color: this.terria.baseMapContrastColor,
-              width: 4
-            }),
+            symbolizer: new CircleSymbolizer(style),
             minzoom: 0,
             maxzoom: Infinity,
             filter: (zoom, feature) =>
@@ -724,4 +734,5 @@ export default class ProtomapsImageryProvider
     }
     return;
   }
+
 }

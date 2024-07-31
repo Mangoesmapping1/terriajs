@@ -1,6 +1,6 @@
 import bbox from "@turf/bbox";
 import i18next from "i18next";
-import { computed, runInAction, makeObservable, override } from "mobx";
+import { computed, runInAction, makeObservable, override, action } from "mobx";
 import {
   GeomType,
   json_style,
@@ -22,6 +22,7 @@ import LegendTraits, {
   LegendItemTraits
 } from "../../../Traits/TraitsClasses/LegendTraits";
 import MapboxVectorTileCatalogItemTraits from "../../../Traits/TraitsClasses/MapboxVectorTileCatalogItemTraits";
+import SearchableItemMixin, { ItemSelectionDisposer } from "terriajs/lib/ModelMixins/SearchableItemMixin";
 import { RectangleTraits } from "../../../Traits/TraitsClasses/MappableTraits";
 import CreateModel from "../../Definition/CreateModel";
 import createStratumInstance from "../../Definition/createStratumInstance";
@@ -30,6 +31,12 @@ import { BaseModel } from "../../Definition/Model";
 import StratumOrder from "../../Definition/StratumOrder";
 import { ModelConstructorParameters } from "../../Definition/Model";
 import proxyCatalogItemUrl from "../proxyCatalogItemUrl";
+import { ItemSearchResult } from "../../ItemSearchProviders/ItemSearchProvider";
+import { default as TerriaFeature } from "../../../Models/Feature/Feature";
+import Cartesian3 from "terriajs-cesium/Source/Core/Cartesian3";
+import Cartographic from "terriajs-cesium/Source/Core/Cartographic";
+import sampleTerrainMostDetailed from "terriajs-cesium/Source/Core/sampleTerrainMostDetailed";
+import isDefined from "terriajs/lib/Core/isDefined";
 
 class MapboxVectorTileLoadableStratum extends LoadableStratum(
   MapboxVectorTileCatalogItemTraits
@@ -109,8 +116,8 @@ class MapboxVectorTileLoadableStratum extends LoadableStratum(
 
 StratumOrder.addLoadStratum(MapboxVectorTileLoadableStratum.stratumName);
 
-class MapboxVectorTileCatalogItem extends MappableMixin(
-  UrlMixin(CatalogMemberMixin(CreateModel(MapboxVectorTileCatalogItemTraits)))
+class MapboxVectorTileCatalogItem extends SearchableItemMixin(MappableMixin(
+  UrlMixin(CatalogMemberMixin(CreateModel(MapboxVectorTileCatalogItemTraits))))
 ) {
   static readonly type = "mvt";
 
@@ -233,6 +240,90 @@ class MapboxVectorTileCatalogItem extends MappableMixin(
       }
     ];
   }
+
+  @action
+  highlightFeaturesFromItemSearchResults(
+    results: ItemSearchResult[]
+  ): ItemSelectionDisposer {
+    const highlightedFeatures: Set<TerriaFeature> = new Set();
+
+    results.forEach(i => {
+      const positionFromLatLng = Cartesian3.fromDegrees(
+        i.featureCoordinate.longitudeDegrees,
+        i.featureCoordinate.latitudeDegrees,
+        i.featureCoordinate.featureHeight
+      );
+
+      const props = i.properties;
+
+      // TODO: pull layer name from somewhere - can it come from ItemSearchResult?
+      props.__LAYERNAME = 'WSMT';
+      props.highlighted = "true";
+
+      const feature = new TerriaFeature({id: i.id.toString(), position:  positionFromLatLng, properties: props });
+      const highlightImageryProvider = this.imageryProvider?.createHighlightImageryProvider(feature);
+
+      if (highlightImageryProvider && this.imageryProvider?.rectangle) {
+        this.terria.currentViewer._addVectorTileHighlight(highlightImageryProvider, this.imageryProvider.rectangle);
+
+        highlightedFeatures.add(feature);
+      }
+    });
+
+    // Need to add a disposer to reset the style
+    const highlightDisposer = action(() => {
+      highlightedFeatures.forEach((feature) => {
+        if (isDefined(feature.properties)) {
+          feature.properties.highlighted = "false";
+        }
+        const highlightImageryProvider = this.imageryProvider?.createHighlightImageryProvider(feature);
+        if (highlightImageryProvider && this.imageryProvider?.rectangle) {
+          this.terria.currentViewer._addVectorTileHighlight(highlightImageryProvider, this.imageryProvider.rectangle);
+        }
+      });
+    });
+
+    return highlightDisposer;
+  }
+
+  @action
+  hideFeaturesNotInItemSearchResults(
+    results: ItemSearchResult[]
+  ): ItemSelectionDisposer {
+    const highlightDisposer = action(() => {
+
+    });
+
+    return highlightDisposer;
+  }
+
+
+  zoomToItemSearchResult = action(async (result: ItemSearchResult) => {
+    if (this.terria.cesium === undefined) return;
+
+    const scene = this.terria.cesium.scene;
+    const camera = scene.camera;
+    const { latitudeDegrees, longitudeDegrees } =
+      result.featureCoordinate;
+
+    const cartographic = Cartographic.fromDegrees(
+      longitudeDegrees,
+      latitudeDegrees
+    );
+    const [terrainCartographic] = await sampleTerrainMostDetailed(
+      scene.terrainProvider,
+      [cartographic]
+    ).catch(() => [cartographic]);
+
+    // for small features we show a top-down view so that it is visible even
+      // if surrounded by larger features
+      const minViewDistance = 50;
+      // height = terrainHeight + featureHeight + minViewDistance
+      terrainCartographic.height += minViewDistance;
+      const destination = Cartographic.toCartesian(cartographic);
+      // use default orientation which is a top-down view of the feature
+      camera.flyTo({ destination, orientation: undefined });
+  });
 }
 
 export default MapboxVectorTileCatalogItem;

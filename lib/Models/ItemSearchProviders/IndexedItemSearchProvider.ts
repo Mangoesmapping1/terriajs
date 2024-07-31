@@ -201,7 +201,8 @@ export default class IndexedItemSearchProvider extends ItemSearchProvider {
       this.indexRoot.resultsDataUrl
     );
     const promise = loadCsv(resultsDataUrl, {
-      dynamicTyping: true,
+      // AC: Changed this to false so that pointnumbers don't get converted to numbers
+      dynamicTyping: false,
       header: true
     });
     this.resultsData = promise;
@@ -210,9 +211,12 @@ export default class IndexedItemSearchProvider extends ItemSearchProvider {
 
   lookupDataForId(
     rows: Record<string, string>[],
-    id: number
+    id: any
   ): Record<string, string> {
-    const row = rows[id];
+    if (!this.indexRoot) throw new Error(`indexRoot is not loaded`);
+    const idProp = this.indexRoot.idProperty;
+    const idx = rows.findIndex(x => x[idProp] == id);
+    const row = rows[idx];
     if (!row) throw new Error(`No data record found for item id: ${id}`);
     return row;
   }

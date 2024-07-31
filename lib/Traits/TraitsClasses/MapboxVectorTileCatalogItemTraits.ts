@@ -8,6 +8,7 @@ import ImageryProviderTraits from "./ImageryProviderTraits";
 import LayerOrderingTraits from "./LayerOrderingTraits";
 import LegendOwnerTraits from "./LegendOwnerTraits";
 import MappableTraits from "./MappableTraits";
+import SearchableItemTraits from "./SearchableItemTraits";
 import UrlTraits from "./UrlTraits";
 
 @traitClass({
@@ -32,7 +33,8 @@ export default class MapboxVectorTileCatalogItemTraits extends mixTraits(
   MappableTraits,
   CatalogMemberTraits,
   LegendOwnerTraits,
-  ImageryProviderTraits
+  ImageryProviderTraits,
+  SearchableItemTraits
 ) {
   @primitiveTrait({
     type: "string",

@@ -342,6 +342,9 @@ export default abstract class GlobeOrMap {
           feature.imageryLayer?.imageryProvider instanceof
           ProtomapsImageryProvider
         ) {
+          if (feature.properties) {
+            feature.properties.highlighted = "true";
+          }
           const highlightImageryProvider =
             feature.imageryLayer.imageryProvider.createHighlightImageryProvider(
               feature
