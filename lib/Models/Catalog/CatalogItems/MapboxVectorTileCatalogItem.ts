@@ -22,7 +22,7 @@ import LegendTraits, {
   LegendItemTraits
 } from "../../../Traits/TraitsClasses/LegendTraits";
 import MapboxVectorTileCatalogItemTraits from "../../../Traits/TraitsClasses/MapboxVectorTileCatalogItemTraits";
-import SearchableItemMixin, { ItemSelectionDisposer } from "terriajs/lib/ModelMixins/SearchableItemMixin";
+import SearchableItemMixin, { ItemSelectionDisposer } from "../../../ModelMixins/SearchableItemMixin";
 import { RectangleTraits } from "../../../Traits/TraitsClasses/MappableTraits";
 import CreateModel from "../../Definition/CreateModel";
 import createStratumInstance from "../../Definition/createStratumInstance";
@@ -36,7 +36,7 @@ import { default as TerriaFeature } from "../../../Models/Feature/Feature";
 import Cartesian3 from "terriajs-cesium/Source/Core/Cartesian3";
 import Cartographic from "terriajs-cesium/Source/Core/Cartographic";
 import sampleTerrainMostDetailed from "terriajs-cesium/Source/Core/sampleTerrainMostDetailed";
-import isDefined from "terriajs/lib/Core/isDefined";
+import isDefined from "../../../Core/isDefined";
 
 class MapboxVectorTileLoadableStratum extends LoadableStratum(
   MapboxVectorTileCatalogItemTraits
