@@ -255,9 +255,10 @@ class MapboxVectorTileCatalogItem extends SearchableItemMixin(MappableMixin(
       );
 
       const props = i.properties;
+      if (this.layer) {
+        props.__LAYERNAME = this.layer;
+      }
 
-      // TODO: pull layer name from somewhere - can it come from ItemSearchResult?
-      props.__LAYERNAME = 'WSMT';
       props.highlighted = "true";
 
       const feature = new TerriaFeature({id: i.id.toString(), position:  positionFromLatLng, properties: props });
