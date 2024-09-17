@@ -79,7 +79,7 @@ export default class CesiumIonSearchProvider extends LocationSearchProviderMixin
     let response: CesiumIonGeocodeResult;
     try {
       response = await loadJson<CesiumIonGeocodeResult>(
-        `${this.url}?text=${searchText}&access_token=${this.key}`
+        `${this.url}?text=${searchText}&access_token=${this.key}&layers=address`
       );
     } catch (e) {
       searchResults.message = {
