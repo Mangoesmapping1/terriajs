@@ -1,4 +1,4 @@
-import MiniSearch, { Options as MiniSearchOptions } from "minisearch";
+import MiniSearch, { Options as MiniSearchOptions, SearchResult } from "minisearch";
 import loadText from "../../Core/loadText";
 import { IndexBase, IndexType } from "./Types";
 import joinUrl from "./joinUrl";
@@ -62,5 +62,16 @@ export default class TextIndex implements IndexBase<TextSearchQuery> {
     const results = miniSearchIndex.search(value, queryOptions);
     const ids = new Set(results.map((r) => r.id));
     return ids;
+  }
+
+  async searchReturnResults(
+    value: TextSearchQuery,
+    queryOptions: MiniSearchOptions
+  ): Promise<SearchResult[]> {
+    if (this.miniSearchIndex === undefined)
+      throw new Error(`Text index not loaded`);
+    const miniSearchIndex = await this.miniSearchIndex;
+    const results = miniSearchIndex.search(value, queryOptions);
+    return results;
   }
 }
