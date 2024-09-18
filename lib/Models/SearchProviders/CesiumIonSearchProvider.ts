@@ -17,8 +17,8 @@ import SearchResult from "./SearchResult";
 import CommonStrata from "../Definition/CommonStrata";
 
 interface CesiumIonGeocodeResultFeature {
-  bbox: [number, number, number, number];
   properties: { label: string };
+  geometry: { coordinates: [number, number]}
 }
 
 interface CesiumIonGeocodeResult {
@@ -97,7 +97,10 @@ export default class CesiumIonSearchProvider extends LocationSearchProviderMixin
       }
 
       searchResults.results = response.features.map<SearchResult>((feature) => {
-        const [w, s, e, n] = feature.bbox;
+        const lat = feature.geometry.coordinates[1];
+        const lon = feature.geometry.coordinates[0];
+
+        const [w, s, e, n] = [lon, lat, lon, lat];
         const rectangle = Rectangle.fromDegrees(w, s, e, n);
 
         return new SearchResult({
