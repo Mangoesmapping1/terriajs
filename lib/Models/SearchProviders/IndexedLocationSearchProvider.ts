@@ -21,7 +21,7 @@ import TextIndex from "../ItemSearchProviders/TextIndex";
 import loadCsv from "../../Core/loadCsv";
 import joinUrl from "../ItemSearchProviders/joinUrl";
 import { Options as MiniSearchOptions, SearchResult as MiniSearchSearchResult } from "minisearch";
-import LocationSearchProviderTraits from "terriajs/lib/Traits/SearchProviders/LocationSearchProviderTraits";
+import LocationSearchProviderTraits from "../../Traits/SearchProviders/LocationSearchProviderTraits";
 
 
 const t = i18next.t.bind(i18next);
