@@ -50,6 +50,8 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
     //   throw new Error(t("indexedItemSearchProvider.missingOptionIndexRootUrl"));
     this.indexRootUrl = "";
     this.index = new TextIndex("");
+
+    // TODO: Move minisearch index path to config.json
     this.index.load("address_minisearch.json", "");
     this.queryOptions = {
       fields: ["address", "lotplan", "street_name"],
