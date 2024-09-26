@@ -22,6 +22,7 @@ import loadCsv from "../../Core/loadCsv";
 import joinUrl from "../ItemSearchProviders/joinUrl";
 import { Options as MiniSearchOptions, SearchResult as MiniSearchSearchResult } from "minisearch";
 import LocationSearchProviderTraits from "../../Traits/SearchProviders/LocationSearchProviderTraits";
+import CameraView from "../CameraView";
 
 
 const t = i18next.t.bind(i18next);
@@ -158,15 +159,23 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
         const lat = feature.latitude;
         const lon = feature.longitude;
 
-        const [w, s, e, n] = [lon, lat, lon, lat];
-        const rectangle = Rectangle.fromDegrees(w, s, e, n);
+        const lookAt = {
+          "lookAt": {
+            "targetLatitude": lat,
+            "targetLongitude": lon,
+            "targetHeight": 0,
+            "pitch": 90,
+            "range": 100
+          }
+        };
 
+        const cameraView = CameraView.fromJson(lookAt)
         return new SearchResult({
           name: `${feature.address} (${feature.lotplan})`,
-          clickAction: createZoomToFunction(this, rectangle),
+          clickAction: createZoomToFunction(this, cameraView),
           location: {
-            latitude: (s + n) / 2,
-            longitude: (e + w) / 2
+            latitude: lat,
+            longitude: lon
           }
         });
       });
@@ -176,10 +185,10 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
 
 function createZoomToFunction(
   model: IndexedLocationSearchProvider,
-  rectangle: Rectangle
+  cameraView: CameraView
 ) {
   return function () {
     const terria = model.terria;
-    terria.currentViewer.zoomTo(rectangle, model.flightDurationSeconds);
+    terria.currentViewer.zoomTo(cameraView, model.flightDurationSeconds);
   };
 }
