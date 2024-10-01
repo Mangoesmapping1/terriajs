@@ -34,7 +34,7 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
   indexRootUrl: string;
   indexRoot?: IndexRoot;
   resultsData?: Promise<Record<string, string>[]>;
-  index: TextIndex;
+  indexes: TextIndex[] = [];
   queryOptions: MiniSearchOptions;
 
   get type() {
@@ -50,18 +50,29 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
     // if (typeof indexRootUrl !== "string")
     //   throw new Error(t("indexedItemSearchProvider.missingOptionIndexRootUrl"));
     this.indexRootUrl = "";
-    this.index = new TextIndex("");
 
-    // TODO: Move minisearch index path to config.json
-    this.index.load("address_minisearch.json", "");
+    // TODO: move this to catalog options
     this.queryOptions = {
-      fields: ["address", "lotplan", "street_name"],
+      fields: ["address", "lotplan", "street_name", "code", "pointnumber"],
       searchOptions: {
         prefix: true,
         fuzzy: 0.2
       }
     };
     this.initialize();
+  }
+
+  async loadIndexes() {
+    console.log(`Loading search indexes: ${this.terria.searchIndexes}`);
+    const indices = this.terria.searchIndexes;
+    this.indexes = await Promise.all(
+      indices.map(async (i: string) => {
+        const textIndex = new TextIndex("");
+        await textIndex.load(`${i}.json`, "");
+        return textIndex;
+      })
+    );
+    console.log(this.indexes);
   }
 
   /**
@@ -130,6 +141,23 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
     );
   }
 
+  async searchLoadedIndexes(searchText: string): Promise<MiniSearchSearchResult[]> {
+    const searchResults: MiniSearchSearchResult[] = [];
+
+    const searchPromises = this.indexes.map(async (index) => {
+      return await index.searchReturnResults(searchText, this.queryOptions);
+    });
+
+    const responses = await Promise.all(searchPromises);
+
+    // Flatten the results from all indexes
+    responses.forEach((response) => {
+      searchResults.push(...response); // Combine results into a single array
+    });
+
+    return searchResults;
+  }
+
   protected async doSearch(
     searchText: string,
     searchResults: SearchProviderResults
@@ -137,9 +165,10 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
     searchResults.results.length = 0;
     searchResults.message = undefined;
 
+    await this.loadIndexes();
     let response: MiniSearchSearchResult[];
     try {
-      response = await this.index.searchReturnResults(searchText, this.queryOptions);
+      response = await this.searchLoadedIndexes(searchText);
     } catch (e) {
       searchResults.message = {
         content: "translate#viewModels.searchErrorOccurred"
@@ -164,20 +193,24 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
             "targetLatitude": lat,
             "targetLongitude": lon,
             "targetHeight": 0,
+            "heading": 0,
             "pitch": 90,
             "range": 100
           }
         };
 
-        const cameraView = CameraView.fromJson(lookAt)
-        return new SearchResult({
-          name: `${feature.address} (${feature.lotplan})`,
+        const cameraView = CameraView.fromJson(lookAt);
+
+        const r = new SearchResult({
+          // TODO: change this to label function
+          name: `${feature.code} (${feature.lotplan})`,
           clickAction: createZoomToFunction(this, cameraView),
           location: {
             latitude: lat,
             longitude: lon
           }
         });
+        return r;
       });
     });
   }

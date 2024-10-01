@@ -580,6 +580,9 @@ export default class Terria {
   @observable
   allowFeatureInfoRequests: boolean = true;
 
+  @observable
+  searchIndexes: string[] = [];
+
   /**
    * Gets or sets the stack of map interactions modes.  The mode at the top of the stack
    * (highest index) handles click interactions with the map
@@ -1707,6 +1710,10 @@ export default class Terria {
       this.storyPromptShown++;
     }
 
+    if (Array.isArray(initData.searchIndexes)) {
+      this.loadSearchIndexes(initData.searchIndexes);
+    }
+
     // Add map settings
     if (isJsonString(initData.viewerMode)) {
       const viewerMode = initData.viewerMode.toLowerCase();
@@ -1923,6 +1930,11 @@ export default class Terria {
   @action
   loadHomeCamera(homeCameraInit: JsonObject | HomeCameraInit) {
     this.mainViewer.homeCamera = CameraView.fromJson(homeCameraInit);
+  }
+
+  @action
+  loadSearchIndexes(searchIndexes: string[]) {
+    this.searchIndexes = searchIndexes;
   }
 
   /**
