@@ -128,6 +128,7 @@ import TimelineStack from "./TimelineStack";
 import { isViewerMode, setViewerMode } from "./ViewerMode";
 import Workbench from "./Workbench";
 import SelectableDimensionWorkflow from "./Workflows/SelectableDimensionWorkflow";
+import TextIndex from "./ItemSearchProviders/TextIndex";
 
 // import overrides from "../Overrides/defaults.jsx";
 
@@ -581,7 +582,7 @@ export default class Terria {
   allowFeatureInfoRequests: boolean = true;
 
   @observable
-  searchIndexes: string[] = [];
+  searchIndexes: TextIndex[] = [];
 
   /**
    * Gets or sets the stack of map interactions modes.  The mode at the top of the stack
@@ -1933,8 +1934,10 @@ export default class Terria {
   }
 
   @action
-  loadSearchIndexes(searchIndexes: string[]) {
-    this.searchIndexes = searchIndexes;
+  loadSearchIndexes(searchIndexes: JsonObject[]) {
+    this.searchIndexes = searchIndexes.map((i: JsonObject) => {
+      return TextIndex.fromJson(i); // Ensure you return the result
+    });
   }
 
   /**

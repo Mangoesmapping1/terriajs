@@ -52,7 +52,7 @@ export interface InitSourceData {
   catalog?: JsonObject[];
   elements?: Map<string, IElementConfig>;
   stories?: StoryData[];
-  searchIndexes?: string[];
+  searchIndexes?: JsonObject[];
   viewerMode?: ViewModeJson;
   baseMaps?: BaseMapsJson;
   homeCamera?: JsonObject;

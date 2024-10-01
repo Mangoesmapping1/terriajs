@@ -20,10 +20,8 @@ import { Index, IndexRoot, IndexType, parseIndexRoot } from "../ItemSearchProvid
 import TextIndex from "../ItemSearchProviders/TextIndex";
 import loadCsv from "../../Core/loadCsv";
 import joinUrl from "../ItemSearchProviders/joinUrl";
-import { Options as MiniSearchOptions, SearchResult as MiniSearchSearchResult } from "minisearch";
 import LocationSearchProviderTraits from "../../Traits/SearchProviders/LocationSearchProviderTraits";
 import CameraView from "../CameraView";
-
 
 const t = i18next.t.bind(i18next);
 
@@ -35,7 +33,6 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
   indexRoot?: IndexRoot;
   resultsData?: Promise<Record<string, string>[]>;
   indexes: TextIndex[] = [];
-  queryOptions: MiniSearchOptions;
 
   get type() {
     return IndexedLocationSearchProvider.type;
@@ -51,28 +48,17 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
     //   throw new Error(t("indexedItemSearchProvider.missingOptionIndexRootUrl"));
     this.indexRootUrl = "";
 
-    // TODO: move this to catalog options
-    this.queryOptions = {
-      fields: ["address", "lotplan", "street_name", "code", "pointnumber"],
-      searchOptions: {
-        prefix: true,
-        fuzzy: 0.2
-      }
-    };
     this.initialize();
   }
 
   async loadIndexes() {
-    console.log(`Loading search indexes: ${this.terria.searchIndexes}`);
     const indices = this.terria.searchIndexes;
     this.indexes = await Promise.all(
-      indices.map(async (i: string) => {
-        const textIndex = new TextIndex("");
-        await textIndex.load(`${i}.json`, "");
-        return textIndex;
+      indices.map(async (i: TextIndex) => {
+        await i.load("", "");
+        return i;
       })
     );
-    console.log(this.indexes);
   }
 
   /**
@@ -141,21 +127,51 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
     );
   }
 
-  async searchLoadedIndexes(searchText: string): Promise<MiniSearchSearchResult[]> {
-    const searchResults: MiniSearchSearchResult[] = [];
-
+  async searchLoadedIndexes(searchText: string): Promise<SearchResult[]> {
     const searchPromises = this.indexes.map(async (index) => {
-      return await index.searchReturnResults(searchText, this.queryOptions);
-    });
+      // Assuming index has a method that returns results and includes properties for name
+      const results = await index.searchReturnResults(searchText);
 
-    const responses = await Promise.all(searchPromises);
+      // Map results to SearchResult instances
+      return results.map((feature) => {
+        const lat = feature.latitude;
+        const lon = feature.longitude;
+
+        const lookAt = {
+          "lookAt": {
+            "targetLatitude": lat,
+            "targetLongitude": lon,
+            "targetHeight": 0,
+            "heading": 0,
+            "pitch": 90,
+            "range": 100
+          }
+        };
+
+        const cameraView = CameraView.fromJson(lookAt);
+
+        // Customize name based on index properties
+        let name = "undefined";
+        if (index.resultLabel) {
+          const prefix = index.resultLabel.prefix as string;
+          const suffix = index.resultLabel.suffix as string;
+          name = `${feature[prefix]} (${feature[suffix]})`;
+        }
+
+        return new SearchResult({
+          name: name,
+          clickAction: createZoomToFunction(this, cameraView),
+          location: {
+            latitude: lat,
+            longitude: lon
+          }
+        });
+      });
+    });
 
     // Flatten the results from all indexes
-    responses.forEach((response) => {
-      searchResults.push(...response); // Combine results into a single array
-    });
-
-    return searchResults;
+    const responses = await Promise.all(searchPromises);
+    return responses.flat(); // Flatten the array of arrays
   }
 
   protected async doSearch(
@@ -166,7 +182,8 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
     searchResults.message = undefined;
 
     await this.loadIndexes();
-    let response: MiniSearchSearchResult[];
+
+    let response: SearchResult[];
     try {
       response = await this.searchLoadedIndexes(searchText);
     } catch (e) {
@@ -184,34 +201,7 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
         return;
       }
 
-      searchResults.results = response.map<SearchResult>((feature) => {
-        const lat = feature.latitude;
-        const lon = feature.longitude;
-
-        const lookAt = {
-          "lookAt": {
-            "targetLatitude": lat,
-            "targetLongitude": lon,
-            "targetHeight": 0,
-            "heading": 0,
-            "pitch": 90,
-            "range": 100
-          }
-        };
-
-        const cameraView = CameraView.fromJson(lookAt);
-
-        const r = new SearchResult({
-          // TODO: change this to label function
-          name: `${feature.code} (${feature.lotplan})`,
-          clickAction: createZoomToFunction(this, cameraView),
-          location: {
-            latitude: lat,
-            longitude: lon
-          }
-        });
-        return r;
-      });
+      searchResults.results = response;
     });
   }
 }

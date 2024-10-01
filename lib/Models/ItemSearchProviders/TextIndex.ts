@@ -2,9 +2,20 @@ import MiniSearch, { Options as MiniSearchOptions, SearchResult } from "minisear
 import loadText from "../../Core/loadText";
 import { IndexBase, IndexType } from "./Types";
 import joinUrl from "./joinUrl";
+import { JsonObject } from "../../Core/Json";
 
 // Text search query
 type TextSearchQuery = string;
+
+class ResultLabel {
+  prefix: string | undefined;
+  suffix: string | undefined;
+
+  constructor(prefix?: string, suffix?: string) {
+    this.prefix = prefix;
+    this.suffix = suffix;
+  }
+}
 
 /**
  * An index for searching arbirtray text.
@@ -23,7 +34,7 @@ export default class TextIndex implements IndexBase<TextSearchQuery> {
    *
    * @param url Url of the text index file
    */
-  constructor(readonly url: string) {}
+  constructor(readonly url: string, readonly resultLabel?: ResultLabel) {}
 
   /**
    * Loads the text index.
@@ -65,13 +76,25 @@ export default class TextIndex implements IndexBase<TextSearchQuery> {
   }
 
   async searchReturnResults(
-    value: TextSearchQuery,
-    queryOptions: MiniSearchOptions
+    value: TextSearchQuery
   ): Promise<SearchResult[]> {
     if (this.miniSearchIndex === undefined)
       throw new Error(`Text index not loaded`);
     const miniSearchIndex = await this.miniSearchIndex;
-    const results = miniSearchIndex.search(value, queryOptions);
+    const results = miniSearchIndex.search(value);
     return results;
+  }
+
+  static fromJson(json: JsonObject) {
+    const url = json.url as string;
+
+    const inputResultLabel = json.resultLabel as JsonObject;
+    const resultLabel: ResultLabel = new ResultLabel();
+    if (inputResultLabel) {
+      resultLabel.prefix = inputResultLabel.prefix as string | undefined;
+      resultLabel.suffix = inputResultLabel.suffix as string | undefined;
+    }
+
+    return new TextIndex(url, resultLabel);
   }
 }
