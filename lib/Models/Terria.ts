@@ -1936,7 +1936,7 @@ export default class Terria {
   @action
   loadSearchIndexes(searchIndexes: JsonObject[]) {
     this.searchIndexes = searchIndexes.map((i: JsonObject) => {
-      return TextIndex.fromJson(i); // Ensure you return the result
+      return TextIndex.fromJson(i);
     });
   }
 
