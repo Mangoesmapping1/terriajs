@@ -18,6 +18,7 @@ import Text from "../../../Styled/Text";
 import withTerriaRef from "../../HOCs/withTerriaRef";
 import MenuPanel from "../../StandardUserInterface/customizable/MenuPanel";
 import Styles from "./setting-panel.scss";
+import { DataThemeItem } from "../../../Models/DataThemes/DataThemesModel";
 
 
 type PropTypes = WithTranslation & {
@@ -28,26 +29,6 @@ type PropTypes = WithTranslation & {
   t: TFunction;
 };
 
-export const Themes = Object.seal({
-  "water": {
-    label: "themePanel.themeLabels.water",
-    url: "/#water",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Concrete_water_pipe.jpg/640px-Concrete_water_pipe.jpg",
-    available: true
-  },
-  "sewer": {
-    label: "themePanel.themeLabels.sewer",
-    url: "/#sewer",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Sewer_manhole_covers_in_Brisbane.jpg/567px-Sewer_manhole_covers_in_Brisbane.jpg?20170922110858",
-    available: true
-  },
-  "property": {
-    label: "themePanel.themeLabels.property",
-    url: "/#property",
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Cooktown.jpg/270px-Cooktown.jpg",
-    available: true
-  }
-});
 
 @observer
 class ThemePanel extends React.Component<PropTypes> {
@@ -59,35 +40,33 @@ class ThemePanel extends React.Component<PropTypes> {
     makeObservable(this);
   }
 
-  @observable _hoverDataTheme = null;
+  @observable _hoverDataTheme: DataThemeItem | undefined = undefined;
 
-  selectTheme(themeKey: keyof typeof Themes, event: MouseEvent<HTMLButtonElement>) {
+  selectTheme(theme: DataThemeItem, event: MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
 
-    const theme = Themes[themeKey];
-    this.props.terria.activeDataTheme = themeKey;
+    this.props.terria.activeDataTheme = theme;
     window.location.replace(theme.url);
   }
 
-  mouseEnterDataTheme(themeLabel: any) {
+  mouseEnterDataTheme(theme: any) {
     runInAction(() => {
-      this._hoverDataTheme = themeLabel;
+      this._hoverDataTheme = theme;
     });
   }
 
   mouseLeaveDataTheme() {
     runInAction(() => {
-      this._hoverDataTheme = null;
+      this._hoverDataTheme = undefined;
     });
   }
 
   @computed
   get activeDataThemeLabel() {
-    const { t } = this.props;
     return this._hoverDataTheme
-      ? t((Themes[this._hoverDataTheme as keyof typeof Themes] as any).label)
+      ? this._hoverDataTheme.label
       : this.props.terria.activeDataTheme
-      ? t((Themes[this.props.terria.activeDataTheme as keyof typeof Themes] as any).label)
+      ? this.props.terria.activeDataTheme.label
       : "(None)";
   }
 
@@ -119,18 +98,18 @@ class ThemePanel extends React.Component<PropTypes> {
             </Text>
           </Box>
           <FlexGrid gap={1} elementsNo={3}>
-            {Object.entries(Themes).map(([key, theme]) => (
+            {this.props.terria.dataThemesModel.dataThemeItems.map((theme) => (
               <StyledBasemapButton
-                key={key}
+                key={theme.id}
                 isActive={
-                  key === this.props.terria.activeDataTheme
+                  theme.id === this.props.terria.activeDataTheme?.id
                 }
-                onClick={(event) => this.selectTheme(key as keyof typeof Themes, event)}
-                onMouseEnter={this.mouseEnterDataTheme.bind(this, key)}
+                onClick={(event) => this.selectTheme(theme, event)}
+                onMouseEnter={this.mouseEnterDataTheme.bind(this, theme)}
                 onMouseLeave={this.mouseLeaveDataTheme.bind(this)}
-                onFocus={this.mouseEnterDataTheme.bind(this, key)}
+                onFocus={this.mouseEnterDataTheme.bind(this, theme)}
               >
-                {key === this.props.terria.activeDataTheme ? (
+                {theme.id === this.props.terria.activeDataTheme?.id ? (
                   <Box position="absolute" topRight>
                     <StyledIcon
                       light

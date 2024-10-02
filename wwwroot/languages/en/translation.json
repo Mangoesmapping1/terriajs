@@ -245,11 +245,6 @@
     "btnTitle": "Advanced toolbox"
   },
   "themePanel": {
-    "themeLabels": {
-      "water": "Water",
-      "sewer": "Sewer",
-      "property": "Property"
-    },
     "btnTitle": "Choose data theme",
     "btnText": "Data Theme"
   },

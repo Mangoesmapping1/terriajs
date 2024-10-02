@@ -76,9 +76,11 @@ import { shareConvertNotification } from "../ReactViews/Notification/shareConver
 import { SearchBarTraits } from "../Traits/SearchProviders/SearchBarTraits";
 import SearchProviderTraits from "../Traits/SearchProviders/SearchProviderTraits";
 import MappableTraits from "../Traits/TraitsClasses/MappableTraits";
+import { DataThemesTraits }  from "../Traits/TraitsClasses/DataThemeTraits";
 import MapNavigationModel from "../ViewModels/MapNavigation/MapNavigationModel";
 import TerriaViewer from "../ViewModels/TerriaViewer";
 import { BaseMapsModel } from "./BaseMaps/BaseMapsModel";
+import { DataThemeItem, DataThemesModel } from "./DataThemes/DataThemesModel";
 import CameraView from "./CameraView";
 import Catalog from "./Catalog/Catalog";
 import CatalogGroup from "./Catalog/CatalogGroup";
@@ -352,6 +354,9 @@ export interface ConfigParameters {
    */
   searchBarConfig?: ModelPropertiesFromTraits<SearchBarTraits>;
   searchProviders: ModelPropertiesFromTraits<SearchProviderTraits>[];
+
+  /* Data themes which appear in menu bar Data Themes */
+  dataThemes: ModelPropertiesFromTraits<DataThemesTraits>;
 }
 
 interface StartOptions {
@@ -449,6 +454,7 @@ export default class Terria {
   readonly overlays = new Workbench();
   readonly catalog = new Catalog(this);
   readonly baseMapsModel = new BaseMapsModel("basemaps", this);
+  readonly dataThemesModel = new DataThemesModel("dataThemes", this);
   readonly searchBarModel = new SearchBarModel(this);
   readonly timelineClock = new Clock({ shouldAnimate: false });
   // readonly overrides: any = overrides; // TODO: add options.functionOverrides like in master
@@ -569,7 +575,14 @@ export default class Terria {
     aboutButtonHrefUrl: "about.html",
     plugins: undefined,
     searchBarConfig: undefined,
-    searchProviders: []
+    searchProviders: [],
+    dataThemes: {
+      "defaultDataThemeId": undefined,
+      "defaultDataThemeName": undefined,
+      "previewDataThemeId": undefined,
+      "enabledDataThemes": [],
+      "items": []
+    }
   };
 
   @observable
@@ -585,7 +598,7 @@ export default class Terria {
   searchIndexes: TextIndex[] = [];
 
   @observable
-  activeDataTheme = "water";
+  activeDataTheme: DataThemeItem | undefined;
 
   /**
    * Gets or sets the stack of map interactions modes.  The mode at the top of the stack
@@ -1078,6 +1091,14 @@ export default class Terria {
       .catchError((error) =>
         this.raiseErrorToUser(
           TerriaError.from(error, "Failed to load default basemaps")
+        )
+      );
+
+    this.dataThemesModel
+      .initializeDataThemes(this.configParameters.dataThemes)
+      .catchError((error) =>
+        this.raiseErrorToUser(
+          TerriaError.from(error, "Failed to load default data themes")
         )
       );
 
