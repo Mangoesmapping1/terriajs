@@ -66,10 +66,7 @@ class ThemePanel extends React.Component<PropTypes> {
 
     const theme = Themes[themeKey];
     this.props.terria.activeDataTheme = themeKey;
-    console.log(theme);
     window.location.replace(theme.url);
-
-    // this.props.terria.baseMapContrastColor = baseMap.contrastColor;
   }
 
   mouseEnterDataTheme(themeLabel: any) {
@@ -117,7 +114,7 @@ class ThemePanel extends React.Component<PropTypes> {
       >
         <Box padded column>
           <Box paddedVertically={1}>
-            <Text as="label">
+            <Text as="label" large bold>
               {this.activeDataThemeLabel}
             </Text>
           </Box>
