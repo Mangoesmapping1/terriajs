@@ -244,6 +244,15 @@
     "btnText": "Tool",
     "btnTitle": "Advanced toolbox"
   },
+  "themePanel": {
+    "themeLabels": {
+      "water": "Water",
+      "sewer": "Sewer",
+      "property": "Property"
+    },
+    "btnTitle": "Choose data theme",
+    "btnText": "Data Theme"
+  },
   "settingPanel": {
     "viewerModeLabels": {
       "CesiumTerrain": "3D Terrain",

@@ -584,6 +584,9 @@ export default class Terria {
   @observable
   searchIndexes: TextIndex[] = [];
 
+  @observable
+  activeDataTheme = "water";
+
   /**
    * Gets or sets the stack of map interactions modes.  The mode at the top of the stack
    * (highest index) handles click interactions with the map

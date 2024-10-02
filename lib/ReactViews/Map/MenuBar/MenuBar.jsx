@@ -12,7 +12,7 @@ import SharePanel from "../Panels/SharePanel/SharePanel";
 import ToolsPanel from "../Panels/ToolsPanel/ToolsPanel";
 import StoryButton from "./StoryButton/StoryButton";
 import HelpButton from "./HelpButton/HelpButton";
-
+import DataThemePanel from "../Panels/DataThemePanel";
 import Styles from "./menu-bar.scss";
 
 const StyledMenuBar = styled.div`
@@ -66,6 +66,9 @@ const MenuBar = observer((props) => {
       </section>
       <section className={classNames(Styles.flex)}>
         <ul className={classNames(Styles.menu)}>
+          <li className={Styles.menuItem}>
+            <DataThemePanel terria={terria} viewState={viewState}  />
+          </li>
           <li className={Styles.menuItem}>
             <SettingPanel terria={terria} viewState={viewState} />
           </li>
