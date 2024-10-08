@@ -1847,6 +1847,15 @@ export default class Terria {
       }
     });
 
+    runInAction(() => {
+      if (isJsonString(initData.activeDataThemeId)) {
+        const activeDataTheme = this.dataThemesModel.dataThemeItems.find(
+          (dataTheme) => dataTheme.id === initData.activeDataThemeId
+        );
+        this.activeDataTheme = activeDataTheme;
+      }
+    });
+
     // Set the new contents of the workbench.
     const newItemsRaw = filterOutUndefined(
       workbench.map((modelId) => {

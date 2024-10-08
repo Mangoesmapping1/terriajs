@@ -64,6 +64,7 @@ export interface InitSourceData {
   timeline?: string[];
   models?: { [key: string]: ModelJson };
   previewedItemId?: string;
+  activeDataThemeId?: string;
   pickedFeatures?: InitSourcePickedFeatures;
   /** These settings will override localStorage persistent settings. They are used for shares/stories */
   settings?: {
