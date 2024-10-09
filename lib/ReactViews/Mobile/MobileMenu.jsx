@@ -15,6 +15,7 @@ import { runInAction } from "mobx";
 import LangPanel from "../Map/Panels/LangPanel/LangPanel";
 import { applyTranslationIfExists } from "../../Language/languageHelpers";
 import { Category, HelpAction } from "../../Core/AnalyticEvents/analyticEvents";
+import DataThemePanel from "../Map/Panels/DataThemePanel";
 
 @observer
 class MobileMenu extends React.Component {
@@ -126,6 +127,12 @@ class MobileMenu extends React.Component {
           ))}
           <div onClick={() => this.hideMenu()}>
             <SettingPanel
+              terria={this.props.terria}
+              viewState={this.props.viewState}
+            />
+          </div>
+          <div onClick={() => this.hideMenu()}>
+            <DataThemePanel
               terria={this.props.terria}
               viewState={this.props.viewState}
             />
