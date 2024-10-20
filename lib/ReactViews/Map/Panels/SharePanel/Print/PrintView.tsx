@@ -18,20 +18,7 @@ import PrintWorkbench from "./PrintWorkbench";
 
 const PRINT_MAP_WIDTH = 1000;
 
-const logoUrl = "path/to/logo.png"; // Update with the actual path to the logo
-
 const styles = `
-    .titleBlock {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid lightgray;
-    }
-
-    .titleBlock img {
-        height: 50px;
-    }
     .tjs-_base__list-reset {
         list-style: none;
         padding-left: 0;
@@ -187,10 +174,6 @@ const PrintView = (props: Props) => {
   return ReactDOM.createPortal(
     <StyleSheetManager target={props.window.document.head}>
       <ThemeProvider theme={terriaTheme}>
-        <div className="titleBlock">
-          <h1>Map Title</h1>
-          <img src={logoUrl} alt="Logo" />
-        </div>
         <PrintViewButtons window={props.window} screenshot={screenshot} />
         <section className="mapSection">
           <div className="datasets">

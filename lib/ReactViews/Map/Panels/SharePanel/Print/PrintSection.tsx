@@ -19,16 +19,7 @@ export const PrintSection: FC<IPrintSectionProps> = ({ viewState }) => {
 
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const [printSize, setPrintSize] = useState("A4");
-
   const printView = () => {
-    const newWindow = window.open();
-    viewState.setPrintWindow(newWindow);
-  };
-
-  const handleSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setPrintSize(event.target.value);
-  };
     const newWindow = window.open();
     viewState.setPrintWindow(newWindow);
   };
@@ -47,15 +38,7 @@ export const PrintSection: FC<IPrintSectionProps> = ({ viewState }) => {
     <Box column>
       <TextSpan medium>{t("share.printTitle")}</TextSpan>
       <Explanation>{t("share.printExplanation")}</Explanation>
-      <Box>
-        <label>
-          {t("share.selectSize")}
-          <select value={printSize} onChange={handleSizeChange}>
-            <option value="A4">A4</option>
-            <option value="A3">A3</option>
-          </select>
-        </label>
-      </Box>
+      <Box gap>
         <PrintButton
           primary
           fullWidth
