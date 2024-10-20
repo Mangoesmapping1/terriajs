@@ -40,7 +40,9 @@ const renderLegend = (catalogItem: BaseModel) => {
 
   return (
     <div key={catalogItem.uniqueId} className="layer-legends">
-      <div className="layer-title">{getName(catalogItem)}</div>
+      <div className="layer-title">
+        <strong>{getName(catalogItem)}</strong>
+      </div>
       {DiscretelyTimeVaryingMixin.isMixedInto(catalogItem) && (
         <div className="layer-time">Time: {catalogItem.currentTime}</div>
       )}
