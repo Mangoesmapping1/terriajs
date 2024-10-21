@@ -10,15 +10,10 @@ import {
   buildShortShareLink,
   canShorten
 } from "../BuildShareLink";
-import PrintDatasets from "./PrintDatasets";
 import PrintSource from "./PrintSource";
 import PrintViewButtons from "./PrintViewButtons";
 import PrintViewMap from "./PrintViewMap";
 import PrintWorkbench from "./PrintWorkbench";
-
-const PRINT_MAP_WIDTH_A4 = 1000; // Adjusted for better fit on A4
-const PRINT_MAP_WIDTH_A3 = 1400; // Adjusted width for better fit on A3
-const PRINT_MAP_WIDTH = PRINT_MAP_WIDTH_A4; // Use A4 width as default
 
 const styles = `
     .tjs-_base__list-reset {
@@ -29,10 +24,10 @@ const styles = `
 
     .mapContainer {
       position: relative;
-      padding: 3px; /* Reduce padding around the map */
+      padding: 3px;
       height: calc(100vh - 150px); /* Reduce vertical space */
-      border: 1px solid lightgray; /* Add border for frame */
-      max-width: ${(props: { isA3: boolean, isLandscape: boolean }) => props.isA3 && props.isLandscape ? '1800px' : '100%'}; /* Adjust width for A3 landscape */
+      border: 1px solid lightgray;
+      max-width: 100%;
     }
 
     @media print {
@@ -75,8 +70,8 @@ const styles = `
       margin: 10px 0;
     }
 
-    .mapSection .datasets{
-      width:200px
+    .mapSection .datasets {
+      width: 200px;
     }
 
     .layer-legends {
@@ -91,7 +86,9 @@ const styles = `
       font-size: 0.5em;
     }
 
-    h1, h2, h3 {
+    h1,
+    h2,
+    h3 {
       clear: both;
     }
 
@@ -157,7 +154,7 @@ const styles = `
       body {
         display: block;
         margin: 0; /* Ensure no margins during print */
-        size: ${(props: { isA3: boolean, isLandscape: boolean }) => props.isA3 ? 'A3 landscape' : (props.isLandscape ? 'A4 landscape' : 'A4 portrait')}; /* Set page size based on isA3 and isLandscape props */
+        size: A4 portrait; /* Set page size */
       }
       .PrintView__printControls {
         display: none;
@@ -166,7 +163,7 @@ const styles = `
 
     main {
       width: 100%; /* Use full width of the page */
-      max-width: ${(props: { isA3: boolean, isLandscape: boolean }) => props.isA3 && props.isLandscape ? '1800px' : (props.isA3 ? PRINT_MAP_WIDTH_A3 : PRINT_MAP_WIDTH_A4)}px; /* Adjust width based on isA3 and isLandscape props */
+      max-width: 100%; /* Ensure it fits within the page */
       margin: 0 auto; /* Center content */
       padding: 0; /* Remove padding to eliminate left margin */
     }
@@ -191,14 +188,16 @@ export const downloadImg = (
 interface Props {
   window: Window;
   closeCallback: () => void;
-  isA3: boolean; // Prop to determine if the print is A3
-  isLandscape: boolean; // New prop to determine if the print is landscape
 }
 
-const getScale = (maybeElement: Element | undefined) =>
-  maybeElement
-    ? PRINT_MAP_WIDTH_A4 / (maybeElement as HTMLElement).offsetWidth
-    : 1;
+const getScale = (maybeElement: Element | undefined) => {
+  if (!maybeElement) return 1;
+  const container = maybeElement as HTMLElement;
+  const mapWidth = container.offsetWidth;
+  const scaleFactor = 1;
+  const scale = mapWidth / (mapWidth * scaleFactor);
+  return scale;
+};
 
 const PrintView = (props: Props) => {
   const viewState = useViewState();

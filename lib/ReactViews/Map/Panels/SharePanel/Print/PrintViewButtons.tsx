@@ -21,7 +21,7 @@ const PrintViewButtons = (props: Props) => {
   }, [props.screenshot]);
 
   return (
-    <ButtonBar>
+    <ButtonBar className="PrintView__printControls">
       <Button
         primary
         disabled={isDisabled}
