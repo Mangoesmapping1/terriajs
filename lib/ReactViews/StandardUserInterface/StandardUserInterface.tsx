@@ -293,6 +293,8 @@ const StandardUserInterfaceBase: React.FC<StandardUserInterfaceProps> =
           <PrintView
             window={props.viewState.printWindow}
             closeCallback={() => props.viewState.setPrintWindow(null)}
+            isA3={props.viewState.size === "A3"} // Ensure size is defined in ViewState
+            isLandscape={props.viewState.orientation === "landscape"} // Pass the selected orientation
           />
         )}
         <ClippingBoxToolLauncher viewState={props.viewState} />
