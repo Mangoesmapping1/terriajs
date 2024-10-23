@@ -5,7 +5,7 @@ import {
   makeObservable,
   observable
 } from "mobx";
-import { JsonObject } from "protomaps";
+import { JsonObject } from "protomaps-leaflet";
 import DeveloperError from "terriajs-cesium/Source/Core/DeveloperError";
 import RuntimeError from "terriajs-cesium/Source/Core/RuntimeError";
 import Result from "../../Core/Result";

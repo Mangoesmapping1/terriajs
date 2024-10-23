@@ -432,6 +432,8 @@ function configureWebpack(
     config.resolve.alias["terriajs-mixins"] ||
     require.resolve("../lib/Sass/common/_mixins.scss");
 
+  config.resolve.alias["pmtiles"] = path.dirname(require.resolve("pmtiles"));
+
   // Alias react and react-dom to the one used by the building folder - apparently we can rely on the dir always being
   // called node_modules https://github.com/npm/npm/issues/2734
   config.resolve.alias["react"] = path.dirname(require.resolve("react"));

@@ -3,12 +3,11 @@ import i18next from "i18next";
 import { computed, runInAction, makeObservable, override, action } from "mobx";
 import {
   GeomType,
-  json_style,
   LabelRule,
   LineSymbolizer,
   PolygonSymbolizer,
-  Rule as PaintRule
-} from "protomaps";
+  PaintRule
+} from "protomaps-leaflet";
 import { JsonObject } from "../../../Core/Json";
 import loadJson from "../../../Core/loadJson";
 import TerriaError from "../../../Core/TerriaError";
@@ -22,7 +21,9 @@ import LegendTraits, {
   LegendItemTraits
 } from "../../../Traits/TraitsClasses/LegendTraits";
 import MapboxVectorTileCatalogItemTraits from "../../../Traits/TraitsClasses/MapboxVectorTileCatalogItemTraits";
-import SearchableItemMixin, { ItemSelectionDisposer } from "../../../ModelMixins/SearchableItemMixin";
+import SearchableItemMixin, {
+  ItemSelectionDisposer
+} from "../../../ModelMixins/SearchableItemMixin";
 import { RectangleTraits } from "../../../Traits/TraitsClasses/MappableTraits";
 import CreateModel from "../../Definition/CreateModel";
 import createStratumInstance from "../../Definition/createStratumInstance";
@@ -116,8 +117,10 @@ class MapboxVectorTileLoadableStratum extends LoadableStratum(
 
 StratumOrder.addLoadStratum(MapboxVectorTileLoadableStratum.stratumName);
 
-class MapboxVectorTileCatalogItem extends SearchableItemMixin(MappableMixin(
-  UrlMixin(CatalogMemberMixin(CreateModel(MapboxVectorTileCatalogItemTraits))))
+class MapboxVectorTileCatalogItem extends SearchableItemMixin(
+  MappableMixin(
+    UrlMixin(CatalogMemberMixin(CreateModel(MapboxVectorTileCatalogItemTraits)))
+  )
 ) {
   static readonly type = "mvt";
 
@@ -149,7 +152,7 @@ class MapboxVectorTileCatalogItem extends SearchableItemMixin(MappableMixin(
   @computed
   get parsedJsonStyle() {
     if (this.style) {
-      return json_style(this.style, new Map());
+      return { paint_rules: [], label_rules: [] };
     }
   }
 
@@ -247,7 +250,7 @@ class MapboxVectorTileCatalogItem extends SearchableItemMixin(MappableMixin(
   ): ItemSelectionDisposer {
     const highlightedFeatures: Set<TerriaFeature> = new Set();
 
-    results.forEach(i => {
+    results.forEach((i) => {
       const positionFromLatLng = Cartesian3.fromDegrees(
         i.featureCoordinate.longitudeDegrees,
         i.featureCoordinate.latitudeDegrees,
@@ -261,11 +264,19 @@ class MapboxVectorTileCatalogItem extends SearchableItemMixin(MappableMixin(
 
       props.highlighted = "true";
 
-      const feature = new TerriaFeature({id: i.id.toString(), position:  positionFromLatLng, properties: props });
-      const highlightImageryProvider = this.imageryProvider?.createHighlightImageryProvider(feature);
+      const feature = new TerriaFeature({
+        id: i.id.toString(),
+        position: positionFromLatLng,
+        properties: props
+      });
+      const highlightImageryProvider =
+        this.imageryProvider?.createHighlightImageryProvider(feature);
 
       if (highlightImageryProvider && this.imageryProvider?.rectangle) {
-        this.terria.currentViewer._addVectorTileHighlight(highlightImageryProvider, this.imageryProvider.rectangle);
+        this.terria.currentViewer._addVectorTileHighlight(
+          highlightImageryProvider,
+          this.imageryProvider.rectangle
+        );
 
         highlightedFeatures.add(feature);
       }
@@ -277,9 +288,13 @@ class MapboxVectorTileCatalogItem extends SearchableItemMixin(MappableMixin(
         if (isDefined(feature.properties)) {
           feature.properties.highlighted = "false";
         }
-        const highlightImageryProvider = this.imageryProvider?.createHighlightImageryProvider(feature);
+        const highlightImageryProvider =
+          this.imageryProvider?.createHighlightImageryProvider(feature);
         if (highlightImageryProvider && this.imageryProvider?.rectangle) {
-          this.terria.currentViewer._addVectorTileHighlight(highlightImageryProvider, this.imageryProvider.rectangle);
+          this.terria.currentViewer._addVectorTileHighlight(
+            highlightImageryProvider,
+            this.imageryProvider.rectangle
+          );
         }
       });
     });
@@ -291,21 +306,17 @@ class MapboxVectorTileCatalogItem extends SearchableItemMixin(MappableMixin(
   hideFeaturesNotInItemSearchResults(
     results: ItemSearchResult[]
   ): ItemSelectionDisposer {
-    const highlightDisposer = action(() => {
-
-    });
+    const highlightDisposer = action(() => {});
 
     return highlightDisposer;
   }
-
 
   zoomToItemSearchResult = action(async (result: ItemSearchResult) => {
     if (this.terria.cesium === undefined) return;
 
     const scene = this.terria.cesium.scene;
     const camera = scene.camera;
-    const { latitudeDegrees, longitudeDegrees } =
-      result.featureCoordinate;
+    const { latitudeDegrees, longitudeDegrees } = result.featureCoordinate;
 
     const cartographic = Cartographic.fromDegrees(
       longitudeDegrees,
@@ -317,13 +328,13 @@ class MapboxVectorTileCatalogItem extends SearchableItemMixin(MappableMixin(
     ).catch(() => [cartographic]);
 
     // for small features we show a top-down view so that it is visible even
-      // if surrounded by larger features
-      const minViewDistance = 50;
-      // height = terrainHeight + featureHeight + minViewDistance
-      terrainCartographic.height += minViewDistance;
-      const destination = Cartographic.toCartesian(cartographic);
-      // use default orientation which is a top-down view of the feature
-      camera.flyTo({ destination, orientation: undefined });
+    // if surrounded by larger features
+    const minViewDistance = 50;
+    // height = terrainHeight + featureHeight + minViewDistance
+    terrainCartographic.height += minViewDistance;
+    const destination = Cartographic.toCartesian(cartographic);
+    // use default orientation which is a top-down view of the feature
+    camera.flyTo({ destination, orientation: undefined });
   });
 }
 
