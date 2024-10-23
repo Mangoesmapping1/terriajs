@@ -2,11 +2,7 @@ import Point from "@mapbox/point-geometry";
 import bbox from "@turf/bbox";
 import booleanIntersects from "@turf/boolean-intersects";
 import circle from "@turf/circle";
-import distance from "@turf/distance";
-import pointToLineDistance from "@turf/point-to-line-distance";
-import { point, lineString } from "@turf/helpers";
 import { Feature } from "@turf/helpers";
-import proj4 from "proj4";
 import i18next from "i18next";
 import { cloneDeep, isEmpty } from "lodash-es";
 import { action, makeObservable, observable, runInAction } from "mobx";
@@ -259,111 +255,6 @@ export class GeojsonSource implements TileSource {
 
     return result;
   }
-}
-
-function adjustTileAndPixelCoordinates(
-  tileX: number,
-  tileY: number,
-  pixelX: number,
-  pixelY: number,
-  tileSize: number
-): { adjustedTileX: number; adjustedTileY: number; adjustedPixelX: number; adjustedPixelY: number } {
-  const adjustedTileX = tileX + Math.floor(pixelX / tileSize);
-  const adjustedTileY = tileY + Math.floor(pixelY / tileSize);
-  const adjustedPixelX = ((pixelX % tileSize) + tileSize) % tileSize;
-  const adjustedPixelY = ((pixelY % tileSize) + tileSize) % tileSize;
-
-  return {
-    adjustedTileX,
-    adjustedTileY,
-    adjustedPixelX,
-    adjustedPixelY,
-  };
-}
-
-function tilePixelToLatLon(
-  tileX: number,
-  tileY: number,
-  zoomLevel: number,
-  pixelX: number,
-  pixelY: number
-): [number, number] {
-  const tileSize = 256; // Assuming each tile is 256x256 pixels
-
-  // Adjust tile and pixel coordinates
-  const {
-    adjustedTileX,
-    adjustedTileY,
-    adjustedPixelX,
-    adjustedPixelY,
-  } = adjustTileAndPixelCoordinates(tileX, tileY, pixelX, pixelY, tileSize);
-
-  console.log("Original tileX, tileY:", tileX, tileY);
-  console.log("Original pixelX, pixelY:", pixelX, pixelY);
-  console.log("Adjusted tileX, tileY:", adjustedTileX, adjustedTileY);
-  console.log("Adjusted pixelX, pixelY:", adjustedPixelX, adjustedPixelY);
-
-  // Invert tileY to match Cesium's tiling scheme
-    const numberOfTilesAtLevel = 1 << zoomLevel;
-    const invertedTileY = numberOfTilesAtLevel - 1 - adjustedTileY;
-
-    // Proceed with coordinate conversion using adjustedTileX and invertedTileY
-    const tilingScheme = new WebMercatorTilingScheme();
-    const rectangle = tilingScheme.tileXYToRectangle(adjustedTileX, invertedTileY, zoomLevel);
-
-    // Calculate the fraction of the pixel position within the tile
-    const xFraction = (adjustedPixelX + 0.5) / tileSize;
-    const yFraction = (adjustedPixelY + 0.5) / tileSize; // Do not invert yFraction here
-
-    // Interpolate longitude and latitude within the tile rectangle
-    const longitude = CesiumMath.lerp(rectangle.west, rectangle.east, xFraction);
-    const latitude = CesiumMath.lerp(rectangle.south, rectangle.north, yFraction);
-
-    // Convert from radians to degrees
-    const lon_deg = CesiumMath.toDegrees(longitude);
-    const lat_deg = CesiumMath.toDegrees(latitude);
-
-    return [lon_deg, lat_deg];
-}
-
-// Define source CRS (Web Mercator)
-const tileCRS = "EPSG:3857";
-
-// Define destination CRS (WGS84)
-const geoCRS = "EPSG:4326";
-
-function convertTileCoordsToGeo(
-  tileX: number,
-  tileY: number,
-  pixelX: number,
-  pixelY: number,
-  zoomLevel: number
-): [number, number] {
-  const tileSize = 256;
-
-  // Adjust tile and pixel coordinates
-  const {
-    adjustedTileX,
-    adjustedTileY,
-    adjustedPixelX,
-    adjustedPixelY,
-  } = adjustTileAndPixelCoordinates(tileX, tileY, pixelX, pixelY, tileSize);
-
-  // Calculate resolution (meters per pixel) at the current zoom level
-    const initialResolution = (2 * Math.PI * 6378137) / tileSize; // Resolution at zoom level 0
-    const resolution = initialResolution / Math.pow(2, zoomLevel);
-
-    // Calculate origin shift
-    const originShift = (2 * Math.PI * 6378137) / 2.0;
-
-    // Convert tile coordinates to Web Mercator meters
-    const mercatorX = adjustedTileX * tileSize * resolution - originShift;
-    const mercatorY = originShift - (adjustedTileY * tileSize * resolution + adjustedPixelY * resolution);
-
-    // Convert Web Mercator meters to geographic coordinates using Proj4
-    const [lon, lat] = proj4(tileCRS, geoCRS, [mercatorX, mercatorY]);
-
-    return [lon, lat];
 }
 
 type Source = PmtilesSource | ZxySource | GeojsonSource;
@@ -624,71 +515,12 @@ export default class ProtomapsImageryProvider
         (r) => r.dataLayer
       );
 
-      console.log("Hello");
-
-      const clickedPoint = point([CesiumMath.toDegrees(longitude), CesiumMath.toDegrees(latitude)]);
-      console.log("Clicked point (lon, lat): ", clickedPoint.geometry.coordinates);
-
-      // Query features at the clicked point
-      const features = this.view.queryFeatures(
-        CesiumMath.toDegrees(longitude),
-        CesiumMath.toDegrees(latitude),
-        level
-      );
-
-      // Set a distance threshold (in meters) for selecting features
-      const distanceThreshold = 10; // Adjust this as needed
-
-      console.log("Tile x,y: ", [x, y]);
-      console.log("Zoom: ", level)
-      // Filter features by calculating the distance to the clicked point
-      const selectedFeatures = features.filter((f) => {
-        if (f.feature.geomType === GeomType.Point) {
-          console.log("Point");
-          const geom: Point[][] = f.feature.geom;
-          const firstPoint = geom[0][0];
-
-          const [lon, lat] = convertTileCoordsToGeo(
-            x,
-            y,
-            firstPoint.x,
-            firstPoint.y,
-            level
-          );
-
-          console.log("Point x,y in tile:", [firstPoint.x, firstPoint.y])
-
-          console.log("Converted feature point (lon, lat): ", [lon, lat]);
-
-          const featurePoint = point([lon, lat]); // Create Turf.js point
-          const dist = distance(clickedPoint, featurePoint, { units: "meters" });
-
-          console.log("Distance to point: ", dist);
-
-          return dist <= distanceThreshold;
-        } else if (f.feature.geomType === GeomType.Line) {
-          console.log("Line");
-
-          // Convert each point in the line from tile coordinates to geographic coordinates
-          const coords = f.feature.geom.flat().map((p) => {
-            console.log("Line points x,y in tile: ", [p.x, p.y])
-            return convertTileCoordsToGeo(x, y, p.x, p.y, level); // Convert each point to lon/lat
-          });
-
-          console.log("Converted line coordinates: ", coords);
-
-          const line = lineString(coords); // Create Turf.js lineString
-          const dist = pointToLineDistance(clickedPoint, line, { units: "meters" });
-
-          console.log("Distance to line: ", dist);
-
-          return dist <= distanceThreshold;
-        }
-        // Return false for unsupported geometry types
-        return false;
-      });
-
-      selectedFeatures
+      this.view
+        .queryFeatures(
+          CesiumMath.toDegrees(longitude),
+          CesiumMath.toDegrees(latitude),
+          level
+        )
         .forEach((f) => {
           // Only create FeatureInfo for visible features with properties
           if (
