@@ -16,6 +16,7 @@ import CzmlCatalogItem from "./CatalogItems/CzmlCatalogItem";
 import GeoJsonCatalogItem from "./CatalogItems/GeoJsonCatalogItem";
 import GeoRssCatalogItem from "./CatalogItems/GeoRssCatalogItem";
 import GpxCatalogItem from "./CatalogItems/GpxCatalogItem";
+import I3SCatalogItem from "./CatalogItems/I3SCatalogItem";
 import IonImageryCatalogItem from "./CatalogItems/IonImageryCatalogItem";
 import KmlCatalogItem from "./CatalogItems/KmlCatalogItem";
 import MapboxMapCatalogItem from "./CatalogItems/MapboxMapCatalogItem";
@@ -41,6 +42,7 @@ import CkanItemReference from "./Ckan/CkanItemReference";
 import ArcGisCatalogGroup from "./Esri/ArcGisCatalogGroup";
 import ArcGisFeatureServerCatalogGroup from "./Esri/ArcGisFeatureServerCatalogGroup";
 import ArcGisFeatureServerCatalogItem from "./Esri/ArcGisFeatureServerCatalogItem";
+import ArcGisImageServerCatalogItem from "./Esri/ArcGisImageServerCatalogItem";
 import ArcGisMapServerCatalogGroup from "./Esri/ArcGisMapServerCatalogGroup";
 import ArcGisMapServerCatalogItem from "./Esri/ArcGisMapServerCatalogItem";
 import ArcGisPortalCatalogGroup from "./Esri/ArcGisPortalCatalogGroup";
@@ -107,6 +109,10 @@ export default function registerCatalogMembers() {
     ArcGisMapServerCatalogItem
   );
   CatalogMemberFactory.register(
+    ArcGisImageServerCatalogItem.type,
+    ArcGisImageServerCatalogItem
+  );
+  CatalogMemberFactory.register(
     ArcGisMapServerCatalogGroup.type,
     ArcGisMapServerCatalogGroup
   );
@@ -141,6 +147,7 @@ export default function registerCatalogMembers() {
     CesiumTerrainCatalogItem.type,
     CesiumTerrainCatalogItem
   );
+  CatalogMemberFactory.register(I3SCatalogItem.type, I3SCatalogItem);
   CatalogMemberFactory.register(
     IonImageryCatalogItem.type,
     IonImageryCatalogItem
@@ -282,6 +289,10 @@ export default function registerCatalogMembers() {
     matchesExtension("zip"),
     ShapefileCatalogItem.type
   );
+  UrlToCatalogMemberMapping.register(
+    matchesExtension("tif", "tiff", "geotiff"),
+    CogCatalogItem.type
+  );
 
   // These items work by trying to match a URL, then loading the data. If it fails, they move on.
   UrlToCatalogMemberMapping.register(
@@ -302,6 +313,11 @@ export default function registerCatalogMembers() {
   UrlToCatalogMemberMapping.register(
     matchesUrl(/\/arcgis\/rest\/.*\/MapServer\/\d+\b/i),
     ArcGisMapServerCatalogItem.type,
+    true
+  );
+  UrlToCatalogMemberMapping.register(
+    matchesUrl(/\/arcgis\/rest\/.*\/ImageServer(\/.*)?$/i),
+    ArcGisImageServerCatalogItem.type,
     true
   );
   UrlToCatalogMemberMapping.register(
@@ -332,6 +348,11 @@ export default function registerCatalogMembers() {
   UrlToCatalogMemberMapping.register(
     matchesUrl(/\/rest\/.*\/MapServer\/\d+\b/i),
     ArcGisMapServerCatalogItem.type,
+    true
+  );
+  UrlToCatalogMemberMapping.register(
+    matchesUrl(/\/rest\/.*\/ImageServer(\/.*)?$/i),
+    ArcGisImageServerCatalogItem.type,
     true
   );
   UrlToCatalogMemberMapping.register(
@@ -397,8 +418,8 @@ function matchesUrl(regex: RegExp) {
   return /./.test.bind(regex);
 }
 
-export function matchesExtension(extension: string) {
-  const regex = new RegExp("\\." + extension + "$", "i");
+export function matchesExtension(...extensions: string[]) {
+  const regex = new RegExp("\\.(" + extensions.join("|") + ")$", "i");
   return function (url: string) {
     return Boolean(url.match(regex));
   };
