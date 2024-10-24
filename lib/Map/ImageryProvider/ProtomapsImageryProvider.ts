@@ -513,20 +513,37 @@ export default class ProtomapsImageryProvider
     // If view is set - this means we are using actual vector tiles (that is not GeoJson object)
     // So we use this.view.queryFeatures
     if (this.view) {
-      this.view
+      const pickedFeatures = this.view
         .queryFeatures(
           CesiumMath.toDegrees(longitude),
           CesiumMath.toDegrees(latitude),
           level,
           50
-        )
+        );
+
+      const sortedFeatures = pickedFeatures.sort((a, b) => {
+        const geomTypeA = a.feature?.geomType;
+        const geomTypeB = b.feature?.geomType;
+
+        // Points first, then lines
+        const isPoint = (geomType: GeomType | undefined) =>
+          geomType === GeomType.Point;
+        const isLine = (geomType: GeomType | undefined) =>
+          geomType === GeomType.Line;
+
+        if (isPoint(geomTypeA) && isLine(geomTypeB)) {
+          return -1; // a (point) comes before b (line)
+        } else if (isLine(geomTypeA) && isPoint(geomTypeB)) {
+          return 1; // b (point) comes before a (line)
+        } else {
+          return 0; // No change in order if both are points or both are lines
+        }
+      });
+
+      sortedFeatures
         .forEach((f) => {
           // Only create FeatureInfo for visible features with properties
-          if (
-            !f.feature.props ||
-            isEmpty(f.feature.props)
-          )
-            return;
+          if (!f.feature.props || isEmpty(f.feature.props)) return;
 
           const featureInfo = new ImageryLayerFeatureInfo();
 
@@ -689,16 +706,19 @@ export default class ProtomapsImageryProvider
   createHighlightImageryProvider(
     feature: TerriaFeature
   ): ProtomapsImageryProvider | undefined {
-    const featureProp = this.source instanceof GeojsonSource
-      ? GEOJSON_FEATURE_ID_PROP
-      : this.idProperty;
+    const featureProp =
+      this.source instanceof GeojsonSource
+        ? GEOJSON_FEATURE_ID_PROP
+        : this.idProperty;
 
-    const layerName = this.source instanceof GeojsonSource
-      ? GEOJSON_SOURCE_LAYER_NAME
-      : feature.properties?.[LAYER_NAME_PROP]?.getValue();
+    const layerName =
+      this.source instanceof GeojsonSource
+        ? GEOJSON_SOURCE_LAYER_NAME
+        : feature.properties?.[LAYER_NAME_PROP]?.getValue();
 
-    console.log(this.layers);
-    const matchingLayer = this.layers.find((layer: any) => layer["source-layer"] === layerName);
+    const matchingLayer = this.layers.find(
+      (layer: any) => layer["source-layer"] === layerName
+    );
 
     // Check if the matching layer has a type of 'circle' or 'line'
     let geometryType: string | undefined;
@@ -707,12 +727,15 @@ export default class ProtomapsImageryProvider
     }
 
     // Default styles for points and lines
-    let pointStyle = { fill: 'blue', width: 2 };
-    let lineStyle = { color: 'blue', width: 2 };
+    let pointStyle = { fill: "blue", width: 2 };
+    let lineStyle = { color: "blue", width: 2 };
 
-    if (isDefined(feature.properties) && feature.properties.highlighted === "true") {
-      pointStyle = { fill: 'cyan', width: 4 };
-      lineStyle = { color: 'cyan', width: 4 };
+    if (
+      isDefined(feature.properties) &&
+      feature.properties.highlighted === "true"
+    ) {
+      pointStyle = { fill: "cyan", width: 4 };
+      lineStyle = { color: "cyan", width: 4 };
     }
 
     const featureId = feature.properties?.[featureProp]?.getValue();
@@ -755,5 +778,4 @@ export default class ProtomapsImageryProvider
 
     return;
   }
-
 }
