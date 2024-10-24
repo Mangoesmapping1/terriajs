@@ -152,8 +152,18 @@ class MapboxVectorTileCatalogItem extends SearchableItemMixin(
   @computed
   get parsedJsonStyle() {
     if (this.style) {
-      return { paint_rules: [], label_rules: [] };
+      console.log(this.style);
+      return { paint_rules: [], label_rules: [], layers: this.style.layers };
     }
+  }
+
+  @computed
+  get layers(): any {
+    if (this.parsedJsonStyle?.layers) {
+      return this.parsedJsonStyle.layers;
+    }
+
+    return [];
   }
 
   @computed
@@ -218,6 +228,7 @@ class MapboxVectorTileCatalogItem extends SearchableItemMixin(
       credit: this.attribution,
       paintRules: this.paintRules,
       labelRules: this.labelRules,
+      layers: this.layers,
       idProperty: this.idProperty
     });
   }

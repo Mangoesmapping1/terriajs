@@ -95,6 +95,7 @@ interface Options {
   credit?: Credit | string;
   paintRules: PaintRule[];
   labelRules: LabelRule[];
+  layers: any;
 
   /** The name of the property that is a unique ID for features */
   idProperty?: string;
@@ -309,6 +310,7 @@ export default class ProtomapsImageryProvider
   readonly source: Source;
   readonly paintRules: PaintRule[];
   readonly labelRules: LabelRule[];
+  readonly layers: any;
 
   constructor(options: Options) {
     makeObservable(this);
@@ -365,6 +367,7 @@ export default class ProtomapsImageryProvider
         : (options.credit as Credit);
 
     // Protomaps
+    this.layers = options.layers;
     this.paintRules = options.paintRules;
     this.labelRules = options.labelRules;
     this.idProperty = options.idProperty ?? "FID";
@@ -675,6 +678,7 @@ export default class ProtomapsImageryProvider
       credit: options?.credit ?? this.credit,
       paintRules: options?.paintRules ?? this.paintRules,
       labelRules: options?.labelRules ?? this.labelRules,
+      layers: options?.layers ?? this.layers,
       processPickedFeatures:
         options?.processPickedFeatures ?? this.processPickedFeatures
     });
@@ -685,48 +689,70 @@ export default class ProtomapsImageryProvider
   createHighlightImageryProvider(
     feature: TerriaFeature
   ): ProtomapsImageryProvider | undefined {
-    // Depending on this.source, feature IDs might be FID (for actual vector tile sources) or they will use GEOJSON_FEATURE_ID_PROP
-    let featureProp: string | undefined;
-    // Similarly, feature layer name will be LAYER_NAME_PROP for mvt, whereas GeoJSON features will use the constant GEOJSON_SOURCE_LAYER_NAME
-    let layerName: string | undefined;
+    const featureProp = this.source instanceof GeojsonSource
+      ? GEOJSON_FEATURE_ID_PROP
+      : this.idProperty;
 
-    if (this.source instanceof GeojsonSource) {
-      featureProp = GEOJSON_FEATURE_ID_PROP;
-      layerName = GEOJSON_SOURCE_LAYER_NAME;
-    } else {
-      featureProp = this.idProperty;
-      layerName = feature.properties?.[LAYER_NAME_PROP]?.getValue();
+    const layerName = this.source instanceof GeojsonSource
+      ? GEOJSON_SOURCE_LAYER_NAME
+      : feature.properties?.[LAYER_NAME_PROP]?.getValue();
+
+    console.log(this.layers);
+    const matchingLayer = this.layers.find((layer: any) => layer["source-layer"] === layerName);
+
+    // Check if the matching layer has a type of 'circle' or 'line'
+    let geometryType: string | undefined;
+    if (matchingLayer && matchingLayer.type) {
+      geometryType = matchingLayer.type;
+    }
+
+    // Default styles for points and lines
+    let pointStyle = { fill: 'blue', width: 2 };
+    let lineStyle = { color: 'blue', width: 2 };
+
+    if (isDefined(feature.properties) && feature.properties.highlighted === "true") {
+      pointStyle = { fill: 'cyan', width: 4 };
+      lineStyle = { color: 'cyan', width: 4 };
     }
 
     const featureId = feature.properties?.[featureProp]?.getValue();
+    if (isDefined(featureId) && isDefined(layerName)) {
+      // Determine geometry type from the layer's type or fallback to "Point"
+      geometryType = geometryType || "Point";
 
-    let style = {
-      fill: 'blue',
-      width: 2
-    };
-    if (isDefined(feature.properties) && feature.properties.highlighted == "true") {
-      style = {
-        fill: 'cyan',
-        width: 4
+      if (geometryType === "circle" || geometryType === "Point") {
+        // Use CircleSymbolizer for points
+        return this.clone({
+          labelRules: [],
+          paintRules: [
+            {
+              dataLayer: layerName,
+              symbolizer: new CircleSymbolizer(pointStyle),
+              minzoom: 0,
+              maxzoom: Infinity,
+              filter: (zoom, feature) =>
+                feature.props?.[featureProp!] === featureId
+            }
+          ]
+        });
+      } else if (geometryType === "line" || geometryType === "LineString") {
+        // Use LineSymbolizer for lines
+        return this.clone({
+          labelRules: [],
+          paintRules: [
+            {
+              dataLayer: layerName,
+              symbolizer: new LineSymbolizer(lineStyle),
+              minzoom: 0,
+              maxzoom: Infinity,
+              filter: (zoom, feature) =>
+                feature.props?.[featureProp!] === featureId
+            }
+          ]
+        });
       }
     }
 
-
-    if (isDefined(featureId) && isDefined(layerName)) {
-      return this.clone({
-        labelRules: [],
-        paintRules: [
-          {
-            dataLayer: layerName,
-            symbolizer: new CircleSymbolizer(style),
-            minzoom: 0,
-            maxzoom: Infinity,
-            filter: (zoom, feature) =>
-              feature.props?.[featureProp!] === featureId
-          }
-        ]
-      });
-    }
     return;
   }
 

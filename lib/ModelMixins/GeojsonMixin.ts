@@ -788,6 +788,7 @@ function GeoJsonMixin<T extends AbstractConstructor<BaseType>>(Base: T) {
         terria: this.terria,
         data: protomapsData,
         id: this.uniqueId,
+        layers: [],
         paintRules: [
           // Polygon features
           {
