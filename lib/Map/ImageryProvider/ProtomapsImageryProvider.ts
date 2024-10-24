@@ -725,6 +725,8 @@ export default class ProtomapsImageryProvider
         ? GEOJSON_SOURCE_LAYER_NAME
         : feature.properties?.[LAYER_NAME_PROP]?.getValue();
 
+    // Get the layer for this feature from mvt json style.
+    // We need this to determine the geometry type.
     const matchingLayer = this.layers.find(
       (layer: any) => layer["source-layer"] === layerName
     );
@@ -749,11 +751,9 @@ export default class ProtomapsImageryProvider
 
     const featureId = feature.properties?.[featureProp]?.getValue();
     if (isDefined(featureId) && isDefined(layerName)) {
-      // Determine geometry type from the layer's type or fallback to "Point"
       geometryType = geometryType || "Point";
 
       if (geometryType === "circle" || geometryType === "Point") {
-        // Use CircleSymbolizer for points
         return this.clone({
           labelRules: [],
           paintRules: [
@@ -768,7 +768,6 @@ export default class ProtomapsImageryProvider
           ]
         });
       } else if (geometryType === "line" || geometryType === "LineString") {
-        // Use LineSymbolizer for lines
         return this.clone({
           labelRules: [],
           paintRules: [
