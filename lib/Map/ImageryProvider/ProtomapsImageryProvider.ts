@@ -75,6 +75,17 @@ interface Coords {
   y: number;
 }
 
+// Define the SourceType enum
+type SourceType = "circle" | "line";
+
+// Define the Layer interface
+interface Layer {
+  "source-layer": string;
+  "source-type": SourceType;
+  // Add other properties for the Layer as needed
+  [key: string]: any; // You can use this if there are other unknown properties
+}
+
 /** Data object can be:
  * - URL of geojson, pmtiles or pbf template (eg `something.com/{z}/{x}/{y}.pbf`)
  * - GeoJsonObject object
@@ -95,7 +106,7 @@ interface Options {
   credit?: Credit | string;
   paintRules: PaintRule[];
   labelRules: LabelRule[];
-  layers: any;
+  layers: Layer[];
 
   /** The name of the property that is a unique ID for features */
   idProperty?: string;
@@ -310,7 +321,7 @@ export default class ProtomapsImageryProvider
   readonly source: Source;
   readonly paintRules: PaintRule[];
   readonly labelRules: LabelRule[];
-  readonly layers: any;
+  readonly layers: Layer[];
 
   constructor(options: Options) {
     makeObservable(this);
@@ -513,13 +524,12 @@ export default class ProtomapsImageryProvider
     // If view is set - this means we are using actual vector tiles (that is not GeoJson object)
     // So we use this.view.queryFeatures
     if (this.view) {
-      const pickedFeatures = this.view
-        .queryFeatures(
-          CesiumMath.toDegrees(longitude),
-          CesiumMath.toDegrees(latitude),
-          level,
-          50
-        );
+      const pickedFeatures = this.view.queryFeatures(
+        CesiumMath.toDegrees(longitude),
+        CesiumMath.toDegrees(latitude),
+        level,
+        50
+      );
 
       const sortedFeatures = pickedFeatures.sort((a, b) => {
         const geomTypeA = a.feature?.geomType;
@@ -540,25 +550,24 @@ export default class ProtomapsImageryProvider
         }
       });
 
-      sortedFeatures
-        .forEach((f) => {
-          // Only create FeatureInfo for visible features with properties
-          if (!f.feature.props || isEmpty(f.feature.props)) return;
+      sortedFeatures.forEach((f) => {
+        // Only create FeatureInfo for visible features with properties
+        if (!f.feature.props || isEmpty(f.feature.props)) return;
 
-          const featureInfo = new ImageryLayerFeatureInfo();
+        const featureInfo = new ImageryLayerFeatureInfo();
 
-          // Add Layer name property
-          featureInfo.properties = Object.assign(
-            { [LAYER_NAME_PROP]: f.layerName },
-            f.feature.props ?? {}
-          );
-          featureInfo.position = new Cartographic(longitude, latitude);
+        // Add Layer name property
+        featureInfo.properties = Object.assign(
+          { [LAYER_NAME_PROP]: f.layerName },
+          f.feature.props ?? {}
+        );
+        featureInfo.position = new Cartographic(longitude, latitude);
 
-          featureInfo.configureDescriptionFromProperties(f.feature.props);
-          featureInfo.configureNameFromProperties(f.feature.props);
+        featureInfo.configureDescriptionFromProperties(f.feature.props);
+        featureInfo.configureNameFromProperties(f.feature.props);
 
-          featureInfos.push(featureInfo);
-        });
+        featureInfos.push(featureInfo);
+      });
 
       // No view is set and we have geoJSON object
       // So we pick features manually
