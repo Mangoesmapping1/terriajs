@@ -294,6 +294,10 @@ export interface ConfigParameters {
    */
   showInAppGuides?: boolean;
   /**
+   * Show the "Search in Catalog" link in Location Search results
+   */
+  showSearchInCatalogLink?: boolean;
+  /**
    * The content to be displayed in the help panel.
    */
   helpContent?: HelpContentItem[];
@@ -575,6 +579,7 @@ export default class Terria {
       videoUrl: "https://www.youtube-nocookie.com/embed/fbiQawV8IYY"
     },
     showInAppGuides: false,
+    showSearchInCatalogLink: true,
     helpContent: [],
     helpContentTerms: defaultTerms,
     languageConfiguration: undefined,
