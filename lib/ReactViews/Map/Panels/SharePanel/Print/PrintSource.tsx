@@ -14,8 +14,8 @@ const PrintSource = (props: Props) => {
         {dateFormat()}
       </p>
       <p>
-        An interactive version of this map can be found here:{" "}
-        <a href={props.link}>{props.link}</a>
+        An interactive version of this map can be found{" "}
+        <a href={props.link}>here</a>
       </p>
     </div>
   );

@@ -10,13 +10,10 @@ import {
   buildShortShareLink,
   canShorten
 } from "../BuildShareLink";
-import PrintDatasets from "./PrintDatasets";
 import PrintSource from "./PrintSource";
 import PrintViewButtons from "./PrintViewButtons";
 import PrintViewMap from "./PrintViewMap";
 import PrintWorkbench from "./PrintWorkbench";
-
-const PRINT_MAP_WIDTH = 1000;
 
 const styles = `
     .tjs-_base__list-reset {
@@ -27,10 +24,44 @@ const styles = `
 
     .mapContainer {
       position: relative;
+      padding: 3px;
+      height: calc(100vh - 150px); /* Reduce vertical space */
+      border: 1px solid lightgray;
+      max-width: 100%;
+    }
+
+    @media print {
+      .PrintViewButtons__ButtonBar,
+      .PrintView__printControls,
+      .PrintViewButtons__ButtonBar-sc-9cld4h-0 {
+        display: none !important;
+      }
+    }
+
+    .titleBlock {
+      display: flex;
+      justify-content: flex-start; /* Align items to the left */
+      align-items: center;
+      padding: 0 10px; /* Remove top/bottom padding */
+      overflow: hidden; /* Ensure content doesn't overflow */
+      white-space: normal; /* Allow text wrapping */
+      font-family: Arial, Helvetica, sans-serif; /* Set font family */
+    }
+
+    .titleBlock img {
+      height: 40px; /* Reduced height for smaller logo */
+      margin-right: 10px; /* Add margin to ensure space between logo and title */
+    }
+
+    .mapContainer {
+      position: relative;
     }
 
     .map-image {
-      width: ${PRINT_MAP_WIDTH}px;
+      width: 100%; /* Ensure map uses full width of the container */
+      height: 100%; /* Fill the container height */
+      object-fit: cover; /* Cover the container while maintaining aspect ratio */
+      max-width: 100%; /* Ensure map uses full width of the container */
     }
 
     .mapSection {
@@ -39,23 +70,47 @@ const styles = `
       margin: 10px 0;
     }
 
-    .mapSection .datasets{
-      width:200px
+    .mapSection .datasets {
+      width: 200px;
     }
 
-    h1, h2, h3 {
+    .layer-legends {
+      font-size: 0.6em; /* Adjust font size for legend text */
+    }
+
+    .layer-title {
+      font-size: 0.6em; /* Adjust font size for legend titles */
+    }
+
+    .tjs-legend__legendTitles {
+      font-size: 0.5em;
+    }
+
+    h1,
+    h2,
+    h3 {
       clear: both;
+    }
+
+    p {
+      font-size: 0.6em;
     }
 
     .WorkbenchItem {
       padding-bottom: 10px;
       margin: 0 5px;
       border-bottom: 1px solid lightgray;
+      font-family: Arial, Helvetica, sans-serif; /* Set font family for datasets */
+      font-size: 0.6em !important; /* Adjust font size to be smaller */
     }
 
     .WorkbenchItem:last-of-type {
       border: 0;
       padding-bottom: 0;
+    }
+
+    .PrintView__source {
+      padding-left: 5px;
     }
 
     .tjs-_form__input {
@@ -88,22 +143,29 @@ const styles = `
     }
 
     body {
-      display:flex;
+      display: flex;
       justify-content: center;
-      width: 100%
-    }
-
-    @media print {
-      body {
-        display: block;
-      }
-      .PrintView__printControls {
-        display: none;
-      }
+      width: 100%;
+      margin: 0; /* Remove default margins */
+      font-family: Arial, Helvetica, sans-serif; /* Set global font family */
     }
 
     main {
-      width: 1200px;
+      width: 100%;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 0;
+    }
+
+    @media print {
+      .PrintView__printControls {
+        display: none;
+      }
+
+      main {
+        margin-left: 5mm;
+        margin-right: 5mm;
+      }
     }
 `;
 
@@ -128,10 +190,14 @@ interface Props {
   closeCallback: () => void;
 }
 
-const getScale = (maybeElement: Element | undefined) =>
-  maybeElement
-    ? PRINT_MAP_WIDTH / (maybeElement as HTMLElement).offsetWidth
-    : 1;
+const getScale = (maybeElement: Element | undefined) => {
+  if (!maybeElement) return 1;
+  const container = maybeElement as HTMLElement;
+  const mapWidth = container.offsetWidth;
+  const scaleFactor = 1;
+  const scale = mapWidth / (mapWidth * scaleFactor);
+  return scale;
+};
 
 const PrintView = (props: Props) => {
   const viewState = useViewState();
@@ -145,12 +211,10 @@ const PrintView = (props: Props) => {
     props.window.document.head.appendChild(mkStyle(styles));
     props.window.document.body.appendChild(rootNode.current);
     props.window.addEventListener("beforeunload", props.closeCallback);
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [props.window]);
 
   useEffect(() => {
     setScreenshot(viewState.terria.currentViewer.captureScreenshot());
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [props.window]);
 
   useEffect(() => {
@@ -176,6 +240,10 @@ const PrintView = (props: Props) => {
   return ReactDOM.createPortal(
     <StyleSheetManager target={props.window.document.head}>
       <ThemeProvider theme={terriaTheme}>
+        <div className="titleBlock">
+          <img src="images/terria.logo" alt="Logo" />
+          <h1 style={{ fontSize: "1.5em" }}>GIS Data</h1>
+        </div>
         <PrintViewButtons window={props.window} screenshot={screenshot} />
         <section className="mapSection">
           <div className="datasets">
@@ -198,10 +266,6 @@ const PrintView = (props: Props) => {
         </section>
         <section className="PrintView__source">
           {shareLink && <PrintSource link={shareLink} />}
-        </section>
-        <section>
-          <h2>Datasets</h2>
-          <PrintDatasets items={viewState.terria.workbench.items} />
         </section>
       </ThemeProvider>
     </StyleSheetManager>,
