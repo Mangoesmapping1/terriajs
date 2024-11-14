@@ -7,6 +7,7 @@ import styled, { DefaultTheme, withTheme } from "styled-components";
 import Terria from "../../../Models/Terria";
 import ViewState from "../../../ReactViewModels/ViewState";
 import Box from "../../../Styled/Box";
+import { RawButton } from "../../../Styled/Button";
 import { GLYPHS, StyledIcon } from "../../../Styled/Icon";
 import Text from "../../../Styled/Text";
 import withTerriaRef from "../../HOCs/withTerriaRef";
@@ -94,7 +95,7 @@ class ThemePanel extends React.Component<PropTypes> {
               <StyledBasemapButton
                 key={theme.id}
                 isActive={theme.id === this.props.terria.activeDataTheme?.id}
-                onClick={(event) => this.selectTheme(theme, event)}
+                onClick={(event: any) => this.selectTheme(theme, event)}
                 onMouseEnter={this.mouseEnterDataTheme.bind(this, theme)}
                 onMouseLeave={this.mouseLeaveDataTheme.bind(this)}
                 onFocus={this.mouseEnterDataTheme.bind(this, theme)}
