@@ -147,12 +147,6 @@ type IButtonProps = {
   isActive: boolean;
 };
 
-const SettingsButton = styled(Button)<IButtonProps>`
-  background-color: ${(props) => props.theme.overlay};
-  border: 1px solid
-    ${(props) => (props.isActive ? "rgba(255, 255, 255, 0.5)" : "transparent")};
-`;
-
 const StyledBasemapButton = styled(RawButton)<IButtonProps>`
   border-radius: 4px;
   position: relative;

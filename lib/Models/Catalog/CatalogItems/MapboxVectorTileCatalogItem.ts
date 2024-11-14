@@ -319,6 +319,7 @@ class MapboxVectorTileCatalogItem extends SearchableItemMixin(
   ): ItemSelectionDisposer {
     const highlightDisposer = action(() => {});
 
+    console.log(results);
     return highlightDisposer;
   }
 

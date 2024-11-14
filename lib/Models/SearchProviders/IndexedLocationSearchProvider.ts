@@ -1,27 +1,17 @@
 import i18next from "i18next";
 import { makeObservable, override, runInAction } from "mobx";
-import Rectangle from "terriajs-cesium/Source/Core/Rectangle";
 
 import {
   Category,
   SearchAction
 } from "../../Core/AnalyticEvents/analyticEvents";
-import loadJson from "../../Core/loadJson";
-import { applyTranslationIfExists } from "../../Language/languageHelpers";
 import LocationSearchProviderMixin from "../../ModelMixins/SearchProviders/LocationSearchProviderMixin";
-import CesiumIonSearchProviderTraits from "../../Traits/SearchProviders/CesiumIonSearchProviderTraits";
 import CreateModel from "../Definition/CreateModel";
 import Terria from "../Terria";
 import SearchProviderResults from "./SearchProviderResults";
 import loadJson5 from "../../Core/loadJson5";
 import SearchResult from "./SearchResult";
-import CommonStrata from "../Definition/CommonStrata";
-import {
-  Index,
-  IndexRoot,
-  IndexType,
-  parseIndexRoot
-} from "../ItemSearchProviders/Index";
+import { IndexRoot, parseIndexRoot } from "../ItemSearchProviders/Index";
 import TextIndex from "../ItemSearchProviders/TextIndex";
 import loadCsv from "../../Core/loadCsv";
 import joinUrl from "../ItemSearchProviders/joinUrl";
@@ -48,9 +38,6 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
 
     makeObservable(this);
 
-    //const indexRootUrl = options?.indexRootUrl;
-    // if (typeof indexRootUrl !== "string")
-    //   throw new Error(t("indexedItemSearchProvider.missingOptionIndexRootUrl"));
     this.indexRootUrl = "";
 
     this.initialize();

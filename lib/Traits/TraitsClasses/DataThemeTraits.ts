@@ -1,5 +1,3 @@
-import CatalogMemberFactory from "../../Models/Catalog/CatalogMemberFactory";
-import modelReferenceTrait from "../Decorators/modelReferenceTrait";
 import objectArrayTrait from "../Decorators/objectArrayTrait";
 import primitiveArrayTrait from "../Decorators/primitiveArrayTrait";
 import primitiveTrait from "../Decorators/primitiveTrait";
