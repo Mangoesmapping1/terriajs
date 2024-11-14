@@ -7,7 +7,6 @@ import styled, { DefaultTheme, withTheme } from "styled-components";
 import Terria from "../../../Models/Terria";
 import ViewState from "../../../ReactViewModels/ViewState";
 import Box from "../../../Styled/Box";
-import Button, { RawButton } from "../../../Styled/Button";
 import { GLYPHS, StyledIcon } from "../../../Styled/Icon";
 import Text from "../../../Styled/Text";
 import withTerriaRef from "../../HOCs/withTerriaRef";
