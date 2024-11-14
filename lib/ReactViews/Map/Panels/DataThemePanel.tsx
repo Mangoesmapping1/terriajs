@@ -1,10 +1,5 @@
 import { TFunction } from "i18next";
-import {
-  computed,
-  observable,
-  runInAction,
-  makeObservable
-} from "mobx";
+import { computed, observable, runInAction, makeObservable } from "mobx";
 import { observer } from "mobx-react";
 import React, { ComponentProps, MouseEvent } from "react";
 import { withTranslation, WithTranslation } from "react-i18next";
@@ -20,7 +15,6 @@ import MenuPanel from "../../StandardUserInterface/customizable/MenuPanel";
 import Styles from "./setting-panel.scss";
 import { DataThemeItem } from "../../../Models/DataThemes/DataThemesModel";
 
-
 type PropTypes = WithTranslation & {
   terria: Terria;
   viewState: ViewState;
@@ -28,7 +22,6 @@ type PropTypes = WithTranslation & {
   theme: DefaultTheme;
   t: TFunction;
 };
-
 
 @observer
 class ThemePanel extends React.Component<PropTypes> {
@@ -101,9 +94,7 @@ class ThemePanel extends React.Component<PropTypes> {
             {this.props.terria.dataThemesModel.dataThemeItems.map((theme) => (
               <StyledBasemapButton
                 key={theme.id}
-                isActive={
-                  theme.id === this.props.terria.activeDataTheme?.id
-                }
+                isActive={theme.id === this.props.terria.activeDataTheme?.id}
                 onClick={(event) => this.selectTheme(theme, event)}
                 onMouseEnter={this.mouseEnterDataTheme.bind(this, theme)}
                 onMouseLeave={this.mouseLeaveDataTheme.bind(this)}

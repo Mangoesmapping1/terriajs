@@ -67,7 +67,7 @@ const MenuBar = observer((props) => {
       <section className={classNames(Styles.flex)}>
         <ul className={classNames(Styles.menu)}>
           <li className={Styles.menuItem}>
-            <DataThemePanel terria={terria} viewState={viewState}  />
+            <DataThemePanel terria={terria} viewState={viewState} />
           </li>
           <li className={Styles.menuItem}>
             <SettingPanel terria={terria} viewState={viewState} />

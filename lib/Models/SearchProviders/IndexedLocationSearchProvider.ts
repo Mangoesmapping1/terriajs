@@ -16,7 +16,12 @@ import SearchProviderResults from "./SearchProviderResults";
 import loadJson5 from "../../Core/loadJson5";
 import SearchResult from "./SearchResult";
 import CommonStrata from "../Definition/CommonStrata";
-import { Index, IndexRoot, IndexType, parseIndexRoot } from "../ItemSearchProviders/Index";
+import {
+  Index,
+  IndexRoot,
+  IndexType,
+  parseIndexRoot
+} from "../ItemSearchProviders/Index";
 import TextIndex from "../ItemSearchProviders/TextIndex";
 import loadCsv from "../../Core/loadCsv";
 import joinUrl from "../ItemSearchProviders/joinUrl";
@@ -138,13 +143,13 @@ export default class IndexedLocationSearchProvider extends LocationSearchProvide
         const lon = feature.longitude;
 
         const lookAt = {
-          "lookAt": {
-            "targetLatitude": lat,
-            "targetLongitude": lon,
-            "targetHeight": 0,
-            "heading": 0,
-            "pitch": 90,
-            "range": 100
+          lookAt: {
+            targetLatitude: lat,
+            targetLongitude: lon,
+            targetHeight: 0,
+            heading: 0,
+            pitch: 90,
+            range: 100
           }
         };
 

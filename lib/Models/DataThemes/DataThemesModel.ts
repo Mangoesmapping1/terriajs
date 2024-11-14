@@ -9,7 +9,10 @@ import CreateModel from "../Definition/CreateModel";
 import ModelPropertiesFromTraits from "../Definition/ModelPropertiesFromTraits";
 import updateModelFromJson from "../Definition/updateModelFromJson";
 import { ModelConstructorParameters } from "../Definition/Model";
-import { DataThemeTraits, DataThemesTraits } from "../../Traits/TraitsClasses/DataThemeTraits";
+import {
+  DataThemeTraits,
+  DataThemesTraits
+} from "../../Traits/TraitsClasses/DataThemeTraits";
 
 export class DataThemeModel extends CreateModel(DataThemeTraits) {}
 
@@ -119,7 +122,7 @@ export class DataThemesModel extends CreateModel(DataThemesTraits) {
         label: defaultDataTheme.label,
         url: defaultDataTheme.url,
         image: defaultDataTheme.image
-      }
+      };
     }
 
     return new Result(

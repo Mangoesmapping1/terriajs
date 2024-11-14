@@ -6,7 +6,6 @@ import primitiveTrait from "../Decorators/primitiveTrait";
 import ModelTraits from "../ModelTraits";
 
 export class DataThemeTraits extends ModelTraits {
-
   @primitiveTrait({
     type: "string",
     name: "id",
@@ -24,16 +23,14 @@ export class DataThemeTraits extends ModelTraits {
   @primitiveTrait({
     type: "string",
     name: "Label",
-    description:
-      "Pointer to translation object for the label of the data theme"
+    description: "Pointer to translation object for the label of the data theme"
   })
   label?: string;
 
   @primitiveTrait({
     type: "string",
     name: "URL",
-    description:
-      "URL to the data theme catalog (eg. /#water)"
+    description: "URL to the data theme catalog (eg. /#water)"
   })
   url: string = "";
 }

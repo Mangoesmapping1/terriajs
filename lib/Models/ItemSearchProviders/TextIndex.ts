@@ -1,4 +1,7 @@
-import MiniSearch, { Options as MiniSearchOptions, SearchResult } from "minisearch";
+import MiniSearch, {
+  Options as MiniSearchOptions,
+  SearchResult
+} from "minisearch";
 import loadText from "../../Core/loadText";
 import { IndexBase, IndexType } from "./Types";
 import joinUrl from "./joinUrl";
@@ -75,9 +78,7 @@ export default class TextIndex implements IndexBase<TextSearchQuery> {
     return ids;
   }
 
-  async searchReturnResults(
-    value: TextSearchQuery
-  ): Promise<SearchResult[]> {
+  async searchReturnResults(value: TextSearchQuery): Promise<SearchResult[]> {
     if (this.miniSearchIndex === undefined)
       throw new Error(`Text index not loaded`);
     const miniSearchIndex = await this.miniSearchIndex;

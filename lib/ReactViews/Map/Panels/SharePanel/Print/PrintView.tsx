@@ -243,13 +243,13 @@ const PrintView = (props: Props) => {
     <StyleSheetManager target={props.window.document.head}>
       <ThemeProvider theme={terriaTheme}>
         <div className="titleBlock">
-          <img src="https://www.cook.qld.gov.au/wp-content/uploads/2023/06/logo-header.svg" alt="Logo" />
+          <img
+            src="https://www.cook.qld.gov.au/wp-content/uploads/2023/06/logo-header.svg"
+            alt="Logo"
+          />
           <h1 style={{ fontSize: "1.5em" }}>GIS Data</h1>
         </div>
-        <PrintViewButtons
-          window={props.window}
-          screenshot={screenshot}
-        />
+        <PrintViewButtons window={props.window} screenshot={screenshot} />
         <section className="mapSection">
           <div className="datasets">
             <PrintWorkbench workbench={viewState.terria.workbench} />
