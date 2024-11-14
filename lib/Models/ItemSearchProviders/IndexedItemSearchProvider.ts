@@ -215,7 +215,7 @@ export default class IndexedItemSearchProvider extends ItemSearchProvider {
   ): Record<string, string> {
     if (!this.indexRoot) throw new Error(`indexRoot is not loaded`);
     const idProp = this.indexRoot.idProperty;
-    const idx = rows.findIndex((x) => x[idProp] == id);
+    const idx = rows.findIndex((x) => x[idProp] === id);
     const row = rows[idx];
     if (!row) throw new Error(`No data record found for item id: ${id}`);
     return row;
