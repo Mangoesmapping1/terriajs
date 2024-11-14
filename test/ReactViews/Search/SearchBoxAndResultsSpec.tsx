@@ -113,12 +113,11 @@ describe("SearchBoxAndResults", function () {
       viewState.searchState.locationSearchText = searchText;
       viewState.searchState.showLocationSearchResults = true;
       viewState.searchState.locationSearchResults = [];
-
       Object.defineProperty(
-        viewState.terria.configParameters.searchBarConfig,
+        viewState.terria.searchBarModel,
         "showSearchInCatalog",
         {
-          value: true,
+          value: false,
           writable: true
         }
       );

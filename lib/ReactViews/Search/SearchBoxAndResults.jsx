@@ -182,8 +182,7 @@ export class SearchBoxAndResultsRaw extends React.Component {
               {/* ~TODO: Put this back once we add a MobX DataCatalogSearch Provider~ */}
               {/* TODO2: Implement a more generic MobX DataCatalogSearch */}
 
-              {this.props.terria.configParameters.searchBarConfig
-                .showSearchInCatalog &&
+              {this.props.terria.searchBarModel.showSearchInCatalog &&
                 searchState.catalogSearchProvider && (
                   <Box column paddedRatio={2}>
                     <SearchInDataCatalog
