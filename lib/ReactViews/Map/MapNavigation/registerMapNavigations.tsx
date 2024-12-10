@@ -109,22 +109,6 @@ export const registerMapNavigations = (viewState: ViewState) => {
     order: 6
   });
 
-  const pedestrianModeToolController = new ToolButtonController({
-    toolName: PEDESTRIAN_MODE_ID,
-    viewState: viewState,
-    getToolComponent: () => PedestrianMode as any,
-    icon: GLYPHS.pedestrian
-  });
-  mapNavigationModel.addItem({
-    id: PEDESTRIAN_MODE_ID,
-    name: "translate#pedestrianMode.toolButtonTitle",
-    title: "translate#pedestrianMode.toolButtonTitle",
-    location: "TOP",
-    screenSize: "medium",
-    controller: pedestrianModeToolController,
-    order: 5
-  });
-
   const closeToolButtonController = new GenericMapNavigationItemController({
     handleClick: () => {
       viewState.closeTool();
