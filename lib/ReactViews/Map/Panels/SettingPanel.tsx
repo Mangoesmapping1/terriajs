@@ -247,15 +247,17 @@ class SettingPanel extends React.Component<PropTypes> {
             <Text as="label">{t("settingPanel.mapView")}</Text>
           </Box>
           <FlexGrid gap={1} elementsNo={3}>
-            {Object.entries(MapViewers).map(([key, viewerMode]) => (
-              <SettingsButton
-                key={key}
-                isActive={key === currentViewer}
-                onClick={(event: any) => this.selectViewer(key as any, event)}
-              >
-                <Text mini>{t(viewerMode.label)}</Text>
-              </SettingsButton>
-            ))}
+            {Object.entries(MapViewers)
+              .filter(([key, viewerMode]) => viewerMode.available)
+              .map(([key, viewerMode]) => (
+                <SettingsButton
+                  key={key}
+                  isActive={key === currentViewer}
+                  onClick={(event: any) => this.selectViewer(key as any, event)}
+                >
+                  <Text mini>{t(viewerMode.label)}</Text>
+                </SettingsButton>
+              ))}
           </FlexGrid>
           {!!supportsSide && (
             <>
