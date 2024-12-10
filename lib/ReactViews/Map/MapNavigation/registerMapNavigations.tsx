@@ -111,57 +111,6 @@ export const registerMapNavigations = (viewState: ViewState) => {
   });
   closeToolButtonController.setVisible(false);
 
-  const augmentedVirtuality = new AugmentedVirtuality(terria);
-  const arController = new AugmentedVirtualityController({
-    terria: terria,
-    viewState: viewState,
-    augmentedVirtuality: augmentedVirtuality
-  });
-  mapNavigationModel.addItem({
-    id: AR_TOOL_ID,
-    name: "translate#AR.arTool",
-    location: "TOP",
-    screenSize: "small",
-    controller: arController,
-    order: 0,
-    noExpand: true
-  });
-
-  const arControllerHover = new AugmentedVirtualityHoverController({
-    augmentedVirtuality: augmentedVirtuality
-  });
-  mapNavigationModel.addItem({
-    id: `${AR_TOOL_ID}_hover`,
-    name: "translate#AR.btnHover",
-    location: "TOP",
-    screenSize: "small",
-    controller: arControllerHover,
-    order: 1,
-    noExpand: true
-  });
-
-  const arRealignController = new AugmentedVirtualityRealignController({
-    terria: terria,
-    viewState: viewState,
-    augmentedVirtuality: augmentedVirtuality
-  });
-  mapNavigationModel.addItem({
-    id: `${AR_TOOL_ID}_realign`,
-    name: runInAction(() =>
-      augmentedVirtuality.manualAlignmentSet
-        ? "translate#AR.btnRealign"
-        : "translate#AR.btnResetRealign"
-    ),
-    location: "TOP",
-    screenSize: "small",
-    controller: arRealignController,
-    render: (
-      <AugmentedVirtualityRealign arRealignController={arRealignController} />
-    ),
-    order: 1,
-    noExpand: true
-  });
-
   const feedbackController = new FeedbackButtonController(viewState);
   mapNavigationModel.addItem({
     id: FEEDBACK_TOOL_ID,
