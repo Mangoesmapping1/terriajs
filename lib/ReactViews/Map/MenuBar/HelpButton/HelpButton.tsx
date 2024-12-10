@@ -19,7 +19,7 @@ const HelpButton = observer(() => {
         onClick={(evt) => {
           evt.preventDefault();
           evt.stopPropagation();
-          viewState.showHelpPanel();
+          window.open("/static/help.html", "_blank");
         }}
       >
         <Icon glyph={Icon.GLYPHS.helpThick} />
