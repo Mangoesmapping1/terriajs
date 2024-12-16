@@ -70,6 +70,9 @@ export default class ViewState {
   readonly terria: Terria;
   readonly relativePosition = RelativePosition;
 
+  @observable barWidth: any = 0;
+  @observable distanceLabel: any = "0";
+
   @observable private _previewedItem: BaseModel | undefined;
   get previewedItem() {
     return this._previewedItem;
@@ -157,6 +160,33 @@ export default class ViewState {
   @observable
   readonly featureInfoPanelButtonGenerators: FeatureInfoPanelButtonGenerator[] =
     [];
+
+  @action.bound
+  setBarWidthItem(barWidth: any) {
+
+    if (typeof this.barWidth === "undefined" ||  typeof barWidth === "undefined") {
+      console.log("this.barWidth or barWidth is undefined")
+    }
+    else{
+      this.barWidth = barWidth;
+    }
+  }
+
+  @action.bound
+  setDistanceLabelItem(distanceLabel: any) {
+
+
+    if (typeof this.distanceLabel === "undefined" ||  typeof distanceLabel === "undefined") {
+      console.log("this.distanceLabel or distanceLabel is undefined")
+    }
+    else{
+        this.distanceLabel = distanceLabel;
+    }
+    //   console.log("distanceLabel is undefined");
+    // } else {
+    //   this.distanceLabel = distanceLabel;
+    // }
+  }
 
   @action
   setSelectedTrainerItem(trainerItem: string) {
@@ -386,6 +416,8 @@ export default class ViewState {
 
   constructor(options: ViewStateOptions) {
     makeObservable(this);
+    this.barWidth = 0;
+    this.distanceLabel = "0";
     const terria = options.terria;
     this.searchState = new SearchState({
       terria,

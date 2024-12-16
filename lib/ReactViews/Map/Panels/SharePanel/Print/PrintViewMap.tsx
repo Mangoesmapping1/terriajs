@@ -11,6 +11,7 @@ const PrintViewMap = (props: Props) => {
 
   useEffect(() => {
     setMap(null);
+
     props.screenshot.then(setMap).catch(() => setError(true));
   }, [props.screenshot]);
 

@@ -2,6 +2,8 @@
 import L from "leaflet";
 import { runInAction } from "mobx";
 import { observer } from "mobx-react";
+
+
 import React, { FC, useEffect, useState } from "react";
 import { useTheme } from "styled-components";
 import Cartesian2 from "terriajs-cesium/Source/Core/Cartesian2";
@@ -26,12 +28,40 @@ interface IDistanceLegendProps {
   isPrintMode?: boolean;
 }
 
+
+import { makeAutoObservable } from "mobx"
+
+// Model the application state.
+// function createPrintLegendStore() {
+//   return makeAutoObservable({
+//     legendStore: {
+//       label: "",
+//       width: ""
+//     },
+//     set(label: any, width: any) {
+//       this.legendStore = {
+//         label: label,
+//         width: width
+//       };
+//     },
+//     get() {
+//       return this.legendStore;
+//     }
+//   });
+// }
+
+// const myPrintLegendStore = createPrintLegendStore()
+
+
 export const DistanceLegend: FC<IDistanceLegendProps> = observer(
   ({ scale = 1, isPrintMode = false }) => {
     const [distanceLabel, setDistanceLabel] = useState<string>();
     const [barWidth, setBarWidth] = useState<number>(0);
 
-    const { terria } = useViewState();
+
+    const { terria,setBarWidthItem,setDistanceLabelItem } = useViewState();
+
+
     const theme = useTheme();
 
     let removeUpdateSubscription:
@@ -143,6 +173,10 @@ export const DistanceLegend: FC<IDistanceLegendProps> = observer(
         }
         setBarWidth(((distance / pixelDistance) * scale) | 0);
         setDistanceLabel(label);
+
+        setBarWidthItem(((distance / pixelDistance) * scale) | 0);
+        setDistanceLabelItem(label);
+
       } else {
         setBarWidth(0);
         setDistanceLabel(undefined);
@@ -163,6 +197,10 @@ export const DistanceLegend: FC<IDistanceLegendProps> = observer(
 
       setBarWidth((meters / maxMeters) * maxPixelWidth * scale);
       setDistanceLabel(label);
+
+      setBarWidthItem((meters / maxMeters) * maxPixelWidth * scale);
+      setDistanceLabelItem(label);
+
     };
 
     const barStyle = {

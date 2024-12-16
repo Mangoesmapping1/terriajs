@@ -25,6 +25,7 @@ export const PrintSection: FC<IPrintSectionProps> = ({ viewState }) => {
   };
 
   const downloadMap = () => {
+    console.log("Download Map!!!");
     setIsDownloading(true);
     viewState.terria.currentViewer
       .captureScreenshot()

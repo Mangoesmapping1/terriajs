@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 import { StyleSheetManager, ThemeProvider } from "styled-components";
 import { terriaTheme } from "../../../../StandardUserInterface";
 import { useViewState } from "../../../../Context";
-import { DistanceLegend } from "../../../BottomBar/DistanceLegend";
+
 import {
   buildShareLink,
   buildShortShareLink,
@@ -15,160 +15,196 @@ import PrintViewButtons from "./PrintViewButtons";
 import PrintViewMap from "./PrintViewMap";
 import PrintWorkbench from "./PrintWorkbench";
 
-const styles = `
-    .tjs-_base__list-reset {
-        list-style: none;
-        padding-left: 0;
-        margin: 0;
-    }
+// const styles = `
+//     .tjs-_base__list-reset {
+//         list-style: none;
+//         padding-left: 0;
+//         margin: 0;
+//     }
+//
+//     .mapContainer {
+//       position: relative;
+//       padding: 3px;
+//       height: calc(100vh - 150px); /* Reduce vertical space */
+//       border: 1px solid lightgray;
+//       max-width: 100%;
+//     }
+//
+//     @media print {
+//       .PrintViewButtons__ButtonBar,
+//       .PrintView__printControls,
+//       .PrintViewButtons__ButtonBar-sc-9cld4h-0 {
+//         display: none !important;
+//       }
+//     }
+//
+//     .titleBlock {
+//       display: flex;
+//       justify-content: flex-start; /* Align items to the left */
+//       align-items: center;
+//       padding: 0 10px; /* Remove top/bottom padding */
+//       overflow: hidden; /* Ensure content doesn't overflow */
+//       white-space: normal; /* Allow text wrapping */
+//       font-family: Arial, Helvetica, sans-serif; /* Set font family */
+//     }
+//
+//     .titleBlock img {
+//       height: 40px; /* Reduced height for smaller logo */
+//       margin-right: 10px; /* Add margin to ensure space between logo and title */
+//     }
+//
+//     .mapContainer {
+//       position: relative;
+//     }
+//
+//     .map-image {
+//       width: 100%; /* Ensure map uses full width of the container */
+//       height: 100%; /* Fill the container height */
+//       object-fit: cover; /* Cover the container while maintaining aspect ratio */
+//       max-width: 100%; /* Ensure map uses full width of the container */
+//     }
+//
+//     .mapSection {
+//       display: flex;
+//       border: 1px solid lightgray;
+//       margin: 10px 0;
+//     }
+//
+//     .mapSection .datasets {
+//       width: 200px;
+//     }
+//
+//     .layer-legends {
+//       font-size: 0.6em; /* Adjust font size for legend text */
+//     }
+//
+//     .layer-title {
+//       font-size: 0.6em; /* Adjust font size for legend titles */
+//     }
+//
+//     .tjs-legend__legendTitles {
+//       font-size: 0.5em;
+//     }
+//
+//     h1,
+//     h2,
+//     h3 {
+//       clear: both;
+//     }
+//
+//     p {
+//       font-size: 0.6em;
+//     }
+//
+//     .WorkbenchItem {
+//       padding-bottom: 10px;
+//       margin: 0 5px;
+//       border-bottom: 1px solid lightgray;
+//       font-family: Arial, Helvetica, sans-serif; /* Set font family for datasets */
+//       font-size: 0.6em !important; /* Adjust font size to be smaller */
+//     }
+//
+//     .WorkbenchItem:last-of-type {
+//       border: 0;
+//       padding-bottom: 0;
+//     }
+//
+//     .PrintView__source {
+//       padding-left: 5px;
+//     }
+//
+//     .tjs-_form__input {
+//       width: 80%;
+//     }
+//
+//     .tjs-legend__distanceLegend {
+//       display: inline-block;
+//       text-align: center;
+//       position: absolute;
+//       bottom: 5px;
+//       right: 10px;
+//       background: white;
+//       padding: 5px;
+//     }
+//
+//     .tjs-legend__distanceLegend > label {
+//       color: black;
+//     }
+//
+//     .tjs-legend__distanceLegend:hover {
+//       background: #fff;
+//     }
+//
+//     .tjs-legend__bar {
+//       border-bottom: 3px solid black;
+//       border-right: 3px solid black;
+//       border-left: 3px solid black;
+//       margin: 0 auto;
+//     }
+//
+//     body {
+//       display: flex;
+//       justify-content: center;
+//       width: 100%;
+//       margin: 0; /* Remove default margins */
+//       font-family: Arial, Helvetica, sans-serif; /* Set global font family */
+//     }
+//
+//     @media print {
+//       body {
+//         display: block;
+//         margin: 0; /* Ensure no margins during print */
+//         size: A4 portrait; /* Set page size */
+//       }
+//       .PrintView__printControls {
+//         display: none;
+//       }
+//     }
+//
+//     main {
+//       width: 100%; /* Use full width of the page */
+//       max-width: 100%; /* Ensure it fits within the page */
+//       margin: 0 auto; /* Center content */
+//       padding: 0; /* Remove padding to eliminate left margin */
+//     }
+// `;
 
-    .mapContainer {
-      position: relative;
-      padding: 3px;
-      height: calc(100vh - 150px); /* Reduce vertical space */
-      border: 1px solid lightgray;
-      max-width: 100%;
-    }
-
-    @media print {
-      .PrintViewButtons__ButtonBar,
-      .PrintView__printControls,
-      .PrintViewButtons__ButtonBar-sc-9cld4h-0 {
-        display: none !important;
-      }
-    }
-
-    .titleBlock {
-      display: flex;
-      justify-content: flex-start; /* Align items to the left */
-      align-items: center;
-      padding: 0 10px; /* Remove top/bottom padding */
-      overflow: hidden; /* Ensure content doesn't overflow */
-      white-space: normal; /* Allow text wrapping */
-      font-family: Arial, Helvetica, sans-serif; /* Set font family */
-    }
-
-    .titleBlock img {
-      height: 40px; /* Reduced height for smaller logo */
-      margin-right: 10px; /* Add margin to ensure space between logo and title */
-    }
-
-    .mapContainer {
-      position: relative;
-    }
-
-    .map-image {
-      width: 100%; /* Ensure map uses full width of the container */
-      height: 100%; /* Fill the container height */
-      object-fit: cover; /* Cover the container while maintaining aspect ratio */
-      max-width: 100%; /* Ensure map uses full width of the container */
-    }
-
-    .mapSection {
-      display: flex;
-      border: 1px solid lightgray;
-      margin: 10px 0;
-    }
-
-    .mapSection .datasets {
-      width: 200px;
-    }
-
-    .layer-legends {
-      font-size: 0.6em; /* Adjust font size for legend text */
-    }
-
-    .layer-title {
-      font-size: 0.6em; /* Adjust font size for legend titles */
-    }
-
-    .tjs-legend__legendTitles {
-      font-size: 0.5em;
-    }
-
-    h1,
-    h2,
-    h3 {
-      clear: both;
-    }
-
-    p {
-      font-size: 0.6em;
-    }
-
-    .WorkbenchItem {
-      padding-bottom: 10px;
-      margin: 0 5px;
-      border-bottom: 1px solid lightgray;
-      font-family: Arial, Helvetica, sans-serif; /* Set font family for datasets */
-      font-size: 0.6em !important; /* Adjust font size to be smaller */
-    }
-
-    .WorkbenchItem:last-of-type {
-      border: 0;
-      padding-bottom: 0;
-    }
-
-    .PrintView__source {
-      padding-left: 5px;
-    }
-
-    .tjs-_form__input {
-      width: 80%;
-    }
-
-    .tjs-legend__distanceLegend {
-      display: inline-block;
-      text-align: center;
-      position: absolute;
-      bottom: 5px;
-      right: 10px;
-      background: white;
-      padding: 5px;
-    }
-
-    .tjs-legend__distanceLegend > label {
-      color: black;
-    }
-
-    .tjs-legend__distanceLegend:hover {
-      background: #fff;
-    }
-
-    .tjs-legend__bar {
-      border-bottom: 3px solid black;
-      border-right: 3px solid black;
-      border-left: 3px solid black;
-      margin: 0 auto;
-    }
-
-    body {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      margin: 0; /* Remove default margins */
-      font-family: Arial, Helvetica, sans-serif; /* Set global font family */
-    }
-
-    @media print {
-      body {
-        display: block;
-        margin: 0; /* Ensure no margins during print */
-        size: A4 portrait; /* Set page size */
-      }
-      .PrintView__printControls {
-        display: none;
-      }
-    }
-
-    main {
-      width: 100%; /* Use full width of the page */
-      max-width: 100%; /* Ensure it fits within the page */
-      margin: 0 auto; /* Center content */
-      padding: 0; /* Remove padding to eliminate left margin */
-    }
-`;
-
+// SimpleLineString component
+// @ts-ignore
+// eslint-disable-next-line react/prop-types
+// const PrintViewMapLegend = ({ barWidth, distanceLabel }) => {
+//   return (
+//     <div style={{ marginTop: "-40px", marginLeft: "20px", width: barWidth }}>
+//       <div>
+//         <div
+//           style={{ width: `${barWidth}px`, left: "32.7094px", height: "2px", fontSize: "0.7rem"}}
+//          />
+//
+//         <div style={{ textAlign: "center" }}>{distanceLabel}</div>
+//       </div>
+//     </div>
+//   );
+// };
+const PrintViewMapLegend = ({ barWidth, distanceLabel }) => {
+  return (
+    <div
+      style={{ marginTop: "-40px", marginLeft: "20px", width: barWidth  }}
+    >
+      <div>
+        <svg height="5" width={barWidth} xmlns="http://www.w3.org/2000/svg">
+          <line
+            x1="0"
+            y1="0"
+            x2={barWidth}
+            y2="0"
+            style={{ stroke: "black", strokeWidth: 5 }}
+          />
+        </svg>
+        <div style={{ textAlign: "center" }}>{distanceLabel}</div>
+      </div>
+    </div>
+  );
+};
 const mkStyle = (unsafeCSS: string) => {
   const style = document.createElement("style");
   style.innerHTML = DOMPurify.sanitize(unsafeCSS, {});
@@ -206,9 +242,12 @@ const PrintView = (props: Props) => {
   const [screenshot, setScreenshot] = useState<Promise<string> | null>(null);
   const [shareLink, setShareLink] = useState("");
 
+  const { barWidth, distanceLabel } = useViewState();
+
+  console.log("printview", barWidth, distanceLabel);
   useEffect(() => {
     props.window.document.title = "Print view";
-    props.window.document.head.appendChild(mkStyle(styles));
+    // props.window.document.head.appendChild(mkStyle(styles));
     props.window.document.body.appendChild(rootNode.current);
     props.window.addEventListener("beforeunload", props.closeCallback);
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
@@ -257,11 +296,9 @@ const PrintView = (props: Props) => {
           <div className="map">
             {screenshot ? (
               <PrintViewMap screenshot={screenshot}>
-                <DistanceLegend
-                  scale={getScale(
-                    viewState.terria.currentViewer.getContainer()
-                  )}
-                  isPrintMode
+                <PrintViewMapLegend
+                  barWidth={barWidth}
+                  distanceLabel={distanceLabel}
                 />
               </PrintViewMap>
             ) : (
