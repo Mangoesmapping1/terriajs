@@ -247,7 +247,7 @@ const PrintView = (props: Props) => {
             src="https://www.cook.qld.gov.au/wp-content/uploads/2023/06/logo-header.svg"
             alt="Logo"
           />
-          <h1 style={{ fontSize: "1.5em" }}>GIS Data</h1>
+          <h1 style={{ fontSize: "1.5em" }}>Cook Shire Maps</h1>
         </div>
         <PrintViewButtons window={props.window} screenshot={screenshot} />
         <section className="mapSection">
