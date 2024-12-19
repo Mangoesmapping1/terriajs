@@ -257,12 +257,7 @@ const PrintView = (props: Props) => {
           <div className="map">
             {screenshot ? (
               <PrintViewMap screenshot={screenshot}>
-                <DistanceLegend
-                  scale={getScale(
-                    viewState.terria.currentViewer.getContainer()
-                  )}
-                  isPrintMode
-                />
+                <div>&nbsp;</div>
               </PrintViewMap>
             ) : (
               <div>Loading...</div>
