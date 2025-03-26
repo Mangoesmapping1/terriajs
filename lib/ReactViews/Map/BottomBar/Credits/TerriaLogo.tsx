@@ -9,7 +9,7 @@ export const TerriaLogo: FC = () => {
       as={"a"}
       target="_blank"
       rel="noopener noreferrer"
-      href="https://terria.io/"
+      href="https://github.com/TerriaJS/terriajs"
     >
       <img css={{ height: "24px" }} src={logo} title="Built with Terria" />
     </Box>
