@@ -14,7 +14,7 @@ import PrintSource from "./PrintSource";
 import PrintViewButtons from "./PrintViewButtons";
 import PrintViewMap from "./PrintViewMap";
 import PrintWorkbench from "./PrintWorkbench";
-import Branding from "../../../../SidePanel/Branding";
+import PrintBranding from "./PrintBranding";
 
 const styles = `
     .tjs-_base__list-reset {
@@ -41,12 +41,16 @@ const styles = `
 
     .titleBlock {
       display: flex;
-      justify-content: flex-start; /* Align items to the left */
+      justify-content: space-between; /* Pull logo and title to the left, buttons to the right */
       align-items: center;
       padding: 0 10px; /* Remove top/bottom padding */
       overflow: hidden; /* Ensure content doesn't overflow */
       white-space: normal; /* Allow text wrapping */
       font-family: Arial, Helvetica, sans-serif; /* Set font family */
+    }
+
+    .titleBlock .leftSection {
+      display: flex;
     }
 
     .titleBlock img {
@@ -244,10 +248,11 @@ const PrintView = (props: Props) => {
     <StyleSheetManager target={props.window.document.head}>
       <ThemeProvider theme={terriaTheme}>
         <div className="titleBlock">
-          <Branding version={"null"} />
-          <h1 style={{ fontSize: "1.5em" }}>GIS Maps</h1>
+          <div className="leftSection">
+            <PrintBranding version={"null"} />
+          </div>
+          <PrintViewButtons window={props.window} screenshot={screenshot} />
         </div>
-        <PrintViewButtons window={props.window} screenshot={screenshot} />
         <section className="mapSection">
           <div className="datasets">
             <PrintWorkbench workbench={viewState.terria.workbench} />

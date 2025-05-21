@@ -246,6 +246,10 @@ export interface ConfigParameters {
    */
   brandBarSmallElements?: string[];
   /**
+   * An array of strings of HTML that fill up the top left logo space in the Print view.
+   */
+  brandBarElementsPrint?: string[];
+  /**
    * Index of which `brandBarElements` to show for mobile header. This will be used if `this.brandBarSmallElements` is undefined.
    */
   displayOneBrand?: number;
@@ -553,6 +557,7 @@ export default class Terria {
     hideTerriaLogo: false,
     brandBarElements: undefined,
     brandBarSmallElements: undefined,
+    brandBarElementsPrint: undefined,
     displayOneBrand: 0,
     disableMyLocation: undefined,
     disableSplitter: undefined,
