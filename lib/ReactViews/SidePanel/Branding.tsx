@@ -41,8 +41,6 @@ export default withViewState(
           justify-content: space-between;
 
           box-sizing: border-box;
-
-          width: 100%;
           height: ${(p: any) => p.theme.logoHeight};
 
           overflow: hidden;

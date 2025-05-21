@@ -14,6 +14,7 @@ import PrintSource from "./PrintSource";
 import PrintViewButtons from "./PrintViewButtons";
 import PrintViewMap from "./PrintViewMap";
 import PrintWorkbench from "./PrintWorkbench";
+import Branding from "../../../../SidePanel/Branding";
 
 const styles = `
     .tjs-_base__list-reset {
@@ -243,11 +244,8 @@ const PrintView = (props: Props) => {
     <StyleSheetManager target={props.window.document.head}>
       <ThemeProvider theme={terriaTheme}>
         <div className="titleBlock">
-          <img
-            src="https://www.cook.qld.gov.au/wp-content/uploads/2023/06/logo-header.svg"
-            alt="Logo"
-          />
-          <h1 style={{ fontSize: "1.5em" }}>Cook Shire Maps</h1>
+          <Branding version={"null"} />
+          <h1 style={{ fontSize: "1.5em" }}>GIS Maps</h1>
         </div>
         <PrintViewButtons window={props.window} screenshot={screenshot} />
         <section className="mapSection">
